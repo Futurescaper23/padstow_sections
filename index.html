@@ -8,18 +8,21 @@
 
   <style>
     :root{
-      --bg:#f4f7fb;
-      --panel:#ffffff;
-      --text:#1f2937;
-      --muted:#6b7280;
-      --line:#d8e1eb;
-      --accent:#0f766e;
-      --danger:#b91c1c;
-      --shadow:0 10px 28px rgba(0,0,0,.08);
+      --bg:#0f1720;
+      --panel:#17212b;
+      --panel-2:#1d2a36;
+      --text:#e8eef5;
+      --muted:#9fb0c2;
+      --line:#2b3b4a;
+      --accent:#18b7a0;
+      --accent-2:#0e8b79;
+      --danger:#ef4444;
+      --shadow:0 10px 30px rgba(0,0,0,.28);
       --radius:18px;
     }
 
     *{box-sizing:border-box}
+
     body{
       margin:0;
       font-family:Arial, Helvetica, sans-serif;
@@ -31,6 +34,7 @@
       max-width:1500px;
       margin:0 auto;
       padding:20px;
+      transition:.25s ease;
     }
 
     .header{
@@ -90,7 +94,7 @@
       border-radius:10px;
       padding:10px 12px;
       font-size:1rem;
-      background:#fff;
+      background:var(--panel-2);
       color:var(--text);
       cursor:pointer;
     }
@@ -109,10 +113,33 @@
       font-size:.92rem;
     }
 
+    button{
+      border:1px solid var(--line);
+      border-radius:10px;
+      padding:10px 14px;
+      background:var(--panel-2);
+      color:var(--text);
+      cursor:pointer;
+      font-weight:700;
+      transition:.2s ease;
+    }
+
+    button:hover{
+      border-color:#3e566a;
+      background:#243444;
+    }
+
+    button.active{
+      background:var(--accent-2);
+      color:#fff;
+      border-color:var(--accent);
+    }
+
     .layout{
       display:grid;
       grid-template-columns:1.12fr .88fr;
       gap:18px;
+      transition:.25s ease;
     }
 
     .card{
@@ -126,6 +153,11 @@
     .card-head{
       padding:16px 18px 12px;
       border-bottom:1px solid var(--line);
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+      flex-wrap:wrap;
     }
 
     .card-head h2{
@@ -149,7 +181,7 @@
       aspect-ratio:16/10;
       border:1px solid var(--line);
       border-radius:14px;
-      background:#eef3f8;
+      background:#0b131b;
       overflow:hidden;
     }
 
@@ -179,15 +211,15 @@
       position:absolute;
       transform:translate(-50%,-50%);
       pointer-events:auto;
-      border:2px solid rgba(255,255,255,.95);
-      background:rgba(15,118,110,.94);
+      border:2px solid rgba(255,255,255,.92);
+      background:rgba(24,183,160,.96);
       color:#fff;
       border-radius:999px;
       padding:8px 11px;
       font-size:.9rem;
       font-weight:700;
       cursor:pointer;
-      box-shadow:0 6px 18px rgba(0,0,0,.16);
+      box-shadow:0 6px 18px rgba(0,0,0,.2);
       white-space:nowrap;
     }
 
@@ -202,7 +234,7 @@
       border-radius:999px;
       background:var(--danger);
       border:2px solid #fff;
-      box-shadow:0 0 0 2px rgba(185,28,28,.18);
+      box-shadow:0 0 0 3px rgba(239,68,68,.18);
       transform:translate(-50%,-50%);
       z-index:5;
       pointer-events:none;
@@ -214,23 +246,6 @@
       display:flex;
       flex-wrap:wrap;
       gap:8px;
-    }
-
-    button{
-      border:1px solid var(--line);
-      border-radius:10px;
-      padding:10px 14px;
-      background:#fff;
-      color:var(--text);
-      cursor:pointer;
-      font-weight:700;
-      transition:.2s ease;
-    }
-
-    button.active{
-      background:var(--accent);
-      color:#fff;
-      border-color:var(--accent);
     }
 
     .legend{
@@ -269,7 +284,7 @@
       border:1px solid var(--line);
       border-radius:12px;
       padding:12px;
-      background:#fbfcff;
+      background:#12202a;
     }
 
     .stat .k{
@@ -293,7 +308,7 @@
       border:1px solid var(--line);
       border-radius:14px;
       padding:12px;
-      background:#fff;
+      background:#0f1822;
     }
 
     .status{
@@ -303,8 +318,24 @@
     }
 
     .error{
-      color:var(--danger);
+      color:#ff8b8b;
       font-weight:700;
+    }
+
+    body.expanded-map .layout{
+      grid-template-columns:1fr;
+    }
+
+    body.expanded-map .map-card{
+      order:1;
+    }
+
+    body.expanded-map .chart-card{
+      order:2;
+    }
+
+    body.expanded-map .map-stage{
+      aspect-ratio:16/7.5;
     }
 
     @media (max-width:1080px){
@@ -331,7 +362,7 @@
     <div class="header">
       <div class="title-wrap">
         <h1>Padstow Estuary Section Profiler</h1>
-        <p>Simple fixed-section viewer with ortho / DSM blending and section-linked profile display.</p>
+        <p>Fixed section viewer with ortho / DSM blending, darker styling, and section-linked profile display.</p>
       </div>
 
       <div class="toolbar">
@@ -351,14 +382,17 @@
     </div>
 
     <div class="layout">
-      <section class="card">
+      <section class="card map-card">
         <div class="card-head">
-          <h2>Fixed Section Map</h2>
-          <p>Ortho and DSM are blended together. Select a fixed section to view the height profile.</p>
+          <div>
+            <h2>Fixed Section Map</h2>
+            <p>Blend ortho and DSM, then select a fixed section to view the height profile.</p>
+          </div>
+          <button id="expandMapBtn" type="button">Expand Map</button>
         </div>
 
         <div class="map-panel">
-          <div class="map-stage" id="mapStage">
+          <div class="map-stage">
             <img id="orthoImage" class="ortho-layer" alt="Ortho" />
             <img id="dsmImage" class="dsm-layer" alt="DSM" />
             <img id="overlayImage" class="overlay-layer" alt="Section lines overlay" />
@@ -375,10 +409,12 @@
         </div>
       </section>
 
-      <section class="card">
+      <section class="card chart-card">
         <div class="card-head">
-          <h2 id="chartTitle">Section Profile</h2>
-          <p id="chartSubtitle">Loading data…</p>
+          <div>
+            <h2 id="chartTitle">Section Profile</h2>
+            <p id="chartSubtitle">Loading data…</p>
+          </div>
         </div>
 
         <div class="chart-panel">
@@ -423,9 +459,9 @@
           csv: "assets/area1/area1_section_profiles.csv",
           defaultSection: "A1-01",
           sections: [
-            { id: "A1-01", label: "Section 1", x: 22, y: 72, x2: 42, y2: 72 },
-            { id: "A1-02", label: "Section 2", x: 49, y: 55, x2: 69, y2: 55 },
-            { id: "A1-03", label: "Section 3", x: 76, y: 38, x2: 90, y2: 38 }
+            { id: "A1-01", label: "Section 1", markerX: 22, markerY: 72, path: [{x:18,y:72},{x:24,y:71},{x:30,y:70},{x:36,y:69},{x:42,y:68}] },
+            { id: "A1-02", label: "Section 2", markerX: 50, markerY: 55, path: [{x:44,y:55},{x:50,y:54},{x:56,y:53},{x:62,y:52},{x:68,y:51}] },
+            { id: "A1-03", label: "Section 3", markerX: 77, markerY: 38, path: [{x:71,y:38},{x:76,y:37},{x:81,y:36},{x:86,y:35},{x:91,y:34}] }
           ]
         },
         area2: {
@@ -437,9 +473,9 @@
           csv: "assets/area2/area2_section_profiles.csv",
           defaultSection: "A2-01",
           sections: [
-            { id: "A2-01", label: "Section 1", x: 22, y: 72, x2: 42, y2: 72 },
-            { id: "A2-02", label: "Section 2", x: 49, y: 55, x2: 69, y2: 55 },
-            { id: "A2-03", label: "Section 3", x: 76, y: 38, x2: 90, y2: 38 }
+            { id: "A2-01", label: "Section 1", markerX: 22, markerY: 72, path: [{x:18,y:72},{x:24,y:71},{x:30,y:70},{x:36,y:69},{x:42,y:68}] },
+            { id: "A2-02", label: "Section 2", markerX: 50, markerY: 55, path: [{x:44,y:55},{x:50,y:54},{x:56,y:53},{x:62,y:52},{x:68,y:51}] },
+            { id: "A2-03", label: "Section 3", markerX: 77, markerY: 38, path: [{x:71,y:38},{x:76,y:37},{x:81,y:36},{x:86,y:35},{x:91,y:34}] }
           ]
         },
         area3: {
@@ -451,9 +487,9 @@
           csv: "assets/area3/area3_section_profiles.csv",
           defaultSection: "A3-01",
           sections: [
-            { id: "A3-01", label: "Section 1", x: 22, y: 72, x2: 42, y2: 72 },
-            { id: "A3-02", label: "Section 2", x: 49, y: 55, x2: 69, y2: 55 },
-            { id: "A3-03", label: "Section 3", x: 76, y: 38, x2: 90, y2: 38 }
+            { id: "A3-01", label: "Section 1", markerX: 22, markerY: 72, path: [{x:18,y:72},{x:24,y:71},{x:30,y:70},{x:36,y:69},{x:42,y:68}] },
+            { id: "A3-02", label: "Section 2", markerX: 50, markerY: 55, path: [{x:44,y:55},{x:50,y:54},{x:56,y:53},{x:62,y:52},{x:68,y:51}] },
+            { id: "A3-03", label: "Section 3", markerX: 77, markerY: 38, path: [{x:71,y:38},{x:76,y:37},{x:81,y:36},{x:86,y:35},{x:91,y:34}] }
           ]
         },
         area4: {
@@ -465,9 +501,9 @@
           csv: "assets/area4/area4_section_profiles.csv",
           defaultSection: "A4-01",
           sections: [
-            { id: "A4-01", label: "Section 1", x: 22, y: 72, x2: 42, y2: 72 },
-            { id: "A4-02", label: "Section 2", x: 49, y: 55, x2: 69, y2: 55 },
-            { id: "A4-03", label: "Section 3", x: 76, y: 38, x2: 90, y2: 38 }
+            { id: "A4-01", label: "Section 1", markerX: 22, markerY: 72, path: [{x:18,y:72},{x:24,y:71},{x:30,y:70},{x:36,y:69},{x:42,y:68}] },
+            { id: "A4-02", label: "Section 2", markerX: 50, markerY: 55, path: [{x:44,y:55},{x:50,y:54},{x:56,y:53},{x:62,y:52},{x:68,y:51}] },
+            { id: "A4-03", label: "Section 3", markerX: 77, markerY: 38, path: [{x:71,y:38},{x:76,y:37},{x:81,y:36},{x:86,y:35},{x:91,y:34}] }
           ]
         },
         area5: {
@@ -479,9 +515,9 @@
           csv: "assets/area5/area5_section_profiles.csv",
           defaultSection: "A5-01",
           sections: [
-            { id: "A5-01", label: "Section 1", x: 22, y: 72, x2: 42, y2: 72 },
-            { id: "A5-02", label: "Section 2", x: 49, y: 55, x2: 69, y2: 55 },
-            { id: "A5-03", label: "Section 3", x: 76, y: 38, x2: 90, y2: 38 }
+            { id: "A5-01", label: "Section 1", markerX: 22, markerY: 72, path: [{x:18,y:72},{x:24,y:71},{x:30,y:70},{x:36,y:69},{x:42,y:68}] },
+            { id: "A5-02", label: "Section 2", markerX: 50, markerY: 55, path: [{x:44,y:55},{x:50,y:54},{x:56,y:53},{x:62,y:52},{x:68,y:51}] },
+            { id: "A5-03", label: "Section 3", markerX: 77, markerY: 38, path: [{x:71,y:38},{x:76,y:37},{x:81,y:36},{x:86,y:35},{x:91,y:34}] }
           ]
         },
         area6: {
@@ -493,9 +529,9 @@
           csv: "assets/area6/area6_section_profiles.csv",
           defaultSection: "A6-01",
           sections: [
-            { id: "A6-01", label: "Section 1", x: 22, y: 72, x2: 42, y2: 72 },
-            { id: "A6-02", label: "Section 2", x: 49, y: 55, x2: 69, y2: 55 },
-            { id: "A6-03", label: "Section 3", x: 76, y: 38, x2: 90, y2: 38 }
+            { id: "A6-01", label: "Section 1", markerX: 22, markerY: 72, path: [{x:18,y:72},{x:24,y:71},{x:30,y:70},{x:36,y:69},{x:42,y:68}] },
+            { id: "A6-02", label: "Section 2", markerX: 50, markerY: 55, path: [{x:44,y:55},{x:50,y:54},{x:56,y:53},{x:62,y:52},{x:68,y:51}] },
+            { id: "A6-03", label: "Section 3", markerX: 77, markerY: 38, path: [{x:71,y:38},{x:76,y:37},{x:81,y:36},{x:86,y:35},{x:91,y:34}] }
           ]
         },
         area7: {
@@ -507,9 +543,9 @@
           csv: "assets/area7/area7_section_profiles.csv",
           defaultSection: "A7-01",
           sections: [
-            { id: "A7-01", label: "Section 1", x: 22, y: 72, x2: 42, y2: 72 },
-            { id: "A7-02", label: "Section 2", x: 49, y: 55, x2: 69, y2: 55 },
-            { id: "A7-03", label: "Section 3", x: 76, y: 38, x2: 90, y2: 38 }
+            { id: "A7-01", label: "Section 1", markerX: 22, markerY: 72, path: [{x:18,y:72},{x:24,y:71},{x:30,y:70},{x:36,y:69},{x:42,y:68}] },
+            { id: "A7-02", label: "Section 2", markerX: 50, markerY: 55, path: [{x:44,y:55},{x:50,y:54},{x:56,y:53},{x:62,y:52},{x:68,y:51}] },
+            { id: "A7-03", label: "Section 3", markerX: 77, markerY: 38, path: [{x:71,y:38},{x:76,y:37},{x:81,y:36},{x:86,y:35},{x:91,y:34}] }
           ]
         },
         area8: {
@@ -521,9 +557,33 @@
           csv: "assets/area8/area8_section_profiles.csv",
           defaultSection: "A8-01",
           sections: [
-            { id: "A8-01", label: "Section 1", x: 25, y: 72, x2: 43, y2: 72 },
-            { id: "A8-02", label: "Section 2", x: 51, y: 55, x2: 67, y2: 55 },
-            { id: "A8-03", label: "Section 3", x: 76, y: 38, x2: 90, y2: 38 }
+            {
+              id: "A8-01",
+              label: "Section 1",
+              markerX: 25,
+              markerY: 72,
+              path: [
+                {x:18,y:73},{x:23,y:72.5},{x:28,y:72},{x:33,y:71.5},{x:38,y:71},{x:43,y:70.5}
+              ]
+            },
+            {
+              id: "A8-02",
+              label: "Section 2",
+              markerX: 51,
+              markerY: 55,
+              path: [
+                {x:44,y:56},{x:49,y:55.5},{x:54,y:55},{x:58,y:54.3},{x:63,y:53.8},{x:68,y:53.2}
+              ]
+            },
+            {
+              id: "A8-03",
+              label: "Section 3",
+              markerX: 76,
+              markerY: 38,
+              path: [
+                {x:70,y:39},{x:74,y:38.5},{x:78,y:38},{x:82,y:37.4},{x:86,y:36.8},{x:90,y:36.2}
+              ]
+            }
           ]
         }
       },
@@ -536,7 +596,8 @@
       sectionId: null,
       rows: [],
       chart: null,
-      hoverIndex: null
+      hoverIndex: null,
+      expanded: false
     };
 
     const els = {
@@ -556,7 +617,8 @@
       statMin: document.getElementById("statMin"),
       statMax: document.getElementById("statMax"),
       statusText: document.getElementById("statusText"),
-      profileChart: document.getElementById("profileChart")
+      profileChart: document.getElementById("profileChart"),
+      expandMapBtn: document.getElementById("expandMapBtn")
     };
 
     function currentArea() {
@@ -651,8 +713,8 @@
         const btn = document.createElement("button");
         btn.type = "button";
         btn.className = "hotspot" + (section.id === state.sectionId ? " active" : "");
-        btn.style.left = `${section.x}%`;
-        btn.style.top = `${section.y}%`;
+        btn.style.left = `${section.markerX}%`;
+        btn.style.top = `${section.markerY}%`;
         btn.textContent = section.label;
         btn.addEventListener("click", () => {
           state.sectionId = section.id;
@@ -693,13 +755,27 @@
         .sort((a, b) => a.distance_m - b.distance_m);
     }
 
+    function pointAlongPath(path, t) {
+      if (!path || !path.length) return null;
+      if (path.length === 1) return path[0];
+      const segments = path.length - 1;
+      const scaled = t * segments;
+      const segIndex = Math.min(Math.floor(scaled), segments - 1);
+      const localT = scaled - segIndex;
+      const p1 = path[segIndex];
+      const p2 = path[segIndex + 1];
+      return {
+        x: p1.x + (p2.x - p1.x) * localT,
+        y: p1.y + (p2.y - p1.y) * localT
+      };
+    }
+
     function updateMarker() {
       const section = currentSectionMeta();
       const rows = getSectionRows();
-      const marker = els.lineMarker;
 
-      if (!section || !rows.length) {
-        marker.style.display = "none";
+      if (!section || !rows.length || !section.path || !section.path.length) {
+        els.lineMarker.style.display = "none";
         return;
       }
 
@@ -708,12 +784,16 @@
         : Math.floor(rows.length / 2);
 
       const progress = rows.length > 1 ? idx / (rows.length - 1) : 0;
-      const x = section.x + (section.x2 - section.x) * progress;
-      const y = section.y + (section.y2 - section.y) * progress;
+      const pt = pointAlongPath(section.path, progress);
 
-      marker.style.left = `${x}%`;
-      marker.style.top = `${y}%`;
-      marker.style.display = "block";
+      if (!pt) {
+        els.lineMarker.style.display = "none";
+        return;
+      }
+
+      els.lineMarker.style.left = `${pt.x}%`;
+      els.lineMarker.style.top = `${pt.y}%`;
+      els.lineMarker.style.display = "block";
     }
 
     function destroyChart() {
@@ -750,7 +830,7 @@
         state.chart = new Chart(els.profileChart, {
           type: "line",
           data: {
-            labels: labels,
+            labels,
             datasets: [{
               label: "Height (m)",
               data: values,
@@ -779,7 +859,10 @@
             },
             plugins: {
               legend: {
-                display: true
+                display: true,
+                labels: {
+                  color: "#d9e5ef"
+                }
               },
               tooltip: {
                 callbacks: {
@@ -796,15 +879,21 @@
             },
             scales: {
               x: {
+                ticks: { color: "#a8bacb" },
+                grid: { color: "rgba(255,255,255,0.06)" },
                 title: {
                   display: true,
-                  text: "Distance along section (m)"
+                  text: "Distance along section (m)",
+                  color: "#d9e5ef"
                 }
               },
               y: {
+                ticks: { color: "#a8bacb" },
+                grid: { color: "rgba(255,255,255,0.06)" },
                 title: {
                   display: true,
-                  text: "Height (m)"
+                  text: "Height (m)",
+                  color: "#d9e5ef"
                 }
               }
             }
@@ -855,7 +944,7 @@
         els.statSection.textContent = "—";
         els.statMin.textContent = "—";
         els.statMax.textContent = "—";
-        setStatus(`Could not load ${area.label}. Check the CSV path and the deployed file names.`, true);
+        setStatus(`Could not load ${area.label}. Check the CSV path and deployed file names.`, true);
       }
     }
 
@@ -865,6 +954,15 @@
           console.error("Image failed to load:", img.src);
         });
       });
+    }
+
+    function toggleExpandedMap() {
+      state.expanded = !state.expanded;
+      document.body.classList.toggle("expanded-map", state.expanded);
+      els.expandMapBtn.textContent = state.expanded ? "Collapse Map" : "Expand Map";
+      setTimeout(() => {
+        if (state.chart) state.chart.resize();
+      }, 250);
     }
 
     function bindEvents() {
@@ -880,6 +978,8 @@
         state.hoverIndex = null;
         updateMarker();
       });
+
+      els.expandMapBtn.addEventListener("click", toggleExpandedMap);
     }
 
     async function init() {
