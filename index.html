@@ -2,357 +2,342 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Padstow Estuary Section Profiler</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
-    :root{
-      --bg:#0f1720;
-      --panel:#17212b;
-      --panel-2:#1d2a36;
-      --text:#e8eef5;
-      --muted:#9fb0c2;
-      --line:#2b3b4a;
-      --accent:#18b7a0;
-      --accent-2:#0e8b79;
-      --danger:#ef4444;
-      --shadow:0 10px 30px rgba(0,0,0,.28);
-      --radius:18px;
+    :root {
+      --bg: #0f1720;
+      --panel: #17212b;
+      --panel-2: #1d2a36;
+      --text: #e8eef5;
+      --muted: #9fb0c2;
+      --line: #2b3b4a;
+      --accent: #18b7a0;
+      --accent-2: #0e8b79;
+      --danger: #ef4444;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+      --radius: 18px;
     }
 
-    *{box-sizing:border-box}
-
-    body{
-      margin:0;
-      font-family:Arial, Helvetica, sans-serif;
-      background:var(--bg);
-      color:var(--text);
+    * {
+      box-sizing: border-box;
     }
 
-    .app{
-      max-width:1500px;
-      margin:0 auto;
-      padding:20px;
-      transition:.25s ease;
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
     }
 
-    .header{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:18px;
-      flex-wrap:wrap;
-      margin-bottom:18px;
+    .app {
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 20px;
     }
 
-    .title-wrap h1{
-      margin:0 0 6px;
-      font-size:1.9rem;
-      line-height:1.05;
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
     }
 
-    .title-wrap p{
-      margin:0;
-      color:var(--muted);
-      font-size:.98rem;
+    .title-wrap h1 {
+      margin: 0 0 6px;
+      font-size: 1.9rem;
+      line-height: 1.05;
     }
 
-    .toolbar{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      align-items:stretch;
+    .title-wrap p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.98rem;
     }
 
-    .toolbox{
-      background:var(--panel);
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:10px 12px;
-      box-shadow:var(--shadow);
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-      min-width:170px;
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: stretch;
     }
 
-    .toolbox label{
-      font-size:.78rem;
-      text-transform:uppercase;
-      letter-spacing:.03em;
-      color:var(--muted);
-      font-weight:700;
+    .toolbox {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 10px 12px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 200px;
     }
 
-    select, input[type="range"]{
-      width:100%;
+    .toolbox label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--muted);
+      font-weight: 700;
     }
 
-    select{
-      border:1px solid var(--line);
-      border-radius:10px;
-      padding:10px 12px;
-      font-size:1rem;
-      background:var(--panel-2);
-      color:var(--text);
-      cursor:pointer;
+    input[type="range"] {
+      width: 100%;
     }
 
-    .slider-row{
-      display:flex;
-      align-items:center;
-      gap:10px;
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
-    .slider-row span{
-      min-width:42px;
-      text-align:right;
-      font-weight:700;
-      color:var(--muted);
-      font-size:.92rem;
+    .slider-row span {
+      min-width: 42px;
+      text-align: right;
+      font-weight: 700;
+      color: var(--muted);
+      font-size: 0.92rem;
     }
 
-    button{
-      border:1px solid var(--line);
-      border-radius:10px;
-      padding:10px 14px;
-      background:var(--panel-2);
-      color:var(--text);
-      cursor:pointer;
-      font-weight:700;
-      transition:.2s ease;
+    button {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 14px;
+      background: var(--panel-2);
+      color: var(--text);
+      cursor: pointer;
+      font-weight: 700;
+      transition: 0.2s ease;
     }
 
-    button:hover{
-      border-color:#3e566a;
-      background:#243444;
+    button:hover {
+      border-color: #3e566a;
+      background: #243444;
     }
 
-    button.active{
-      background:var(--accent-2);
-      color:#fff;
-      border-color:var(--accent);
+    button.active {
+      background: var(--accent-2);
+      color: #fff;
+      border-color: var(--accent);
     }
 
-    .layout{
-      display:grid;
-      grid-template-columns:1.12fr .88fr;
-      gap:18px;
-      transition:.25s ease;
+    .layout {
+      display: grid;
+      grid-template-columns: 1.12fr 0.88fr;
+      gap: 18px;
+      transition: 0.25s ease;
     }
 
-    .card{
-      background:var(--panel);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      overflow:hidden;
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
     }
 
-    .card-head{
-      padding:16px 18px 12px;
-      border-bottom:1px solid var(--line);
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:12px;
-      flex-wrap:wrap;
+    .card-head {
+      padding: 16px 18px 12px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      flex-wrap: wrap;
     }
 
-    .card-head h2{
-      margin:0 0 4px;
-      font-size:1.15rem;
+    .card-head h2 {
+      margin: 0 0 4px;
+      font-size: 1.15rem;
     }
 
-    .card-head p{
-      margin:0;
-      color:var(--muted);
-      font-size:.95rem;
+    .card-head p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
     }
 
-    .map-panel{
-      padding:14px;
+    .map-panel {
+      padding: 14px;
     }
 
-    .map-stage{
-      position:relative;
-      width:100%;
-      aspect-ratio:16/10;
-      border:1px solid var(--line);
-      border-radius:14px;
-      background:#0b131b;
-      overflow:hidden;
+    .map-stage {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #0b131b;
+      overflow: hidden;
     }
 
-    .map-stage img{
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
-      object-fit:contain;
-      user-select:none;
-      -webkit-user-drag:none;
-      pointer-events:none;
+    .map-stage img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      user-select: none;
+      -webkit-user-drag: none;
+      pointer-events: none;
     }
 
-    .ortho-layer{z-index:1}
-    .dsm-layer{z-index:2}
-    .overlay-layer{z-index:3}
-
-    .hotspots{
-      position:absolute;
-      inset:0;
-      z-index:4;
-      pointer-events:none;
+    .ortho-layer {
+      z-index: 1;
     }
 
-    .hotspot{
-      position:absolute;
-      transform:translate(-50%,-50%);
-      pointer-events:auto;
-      border:2px solid rgba(255,255,255,.92);
-      background:rgba(24,183,160,.96);
-      color:#fff;
-      border-radius:999px;
-      padding:8px 11px;
-      font-size:.9rem;
-      font-weight:700;
-      cursor:pointer;
-      box-shadow:0 6px 18px rgba(0,0,0,.2);
-      white-space:nowrap;
+    .dsm-layer {
+      z-index: 2;
     }
 
-    .hotspot.active{
-      background:var(--danger);
+    .overlay-layer {
+      z-index: 3;
     }
 
-    .line-marker{
-      position:absolute;
-      width:14px;
-      height:14px;
-      border-radius:999px;
-      background:var(--danger);
-      border:2px solid #fff;
-      box-shadow:0 0 0 3px rgba(239,68,68,.18);
-      transform:translate(-50%,-50%);
-      z-index:5;
-      pointer-events:none;
-      display:none;
+    .line-marker {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      background: var(--danger);
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.18);
+      transform: translate(-50%, -50%);
+      z-index: 5;
+      pointer-events: none;
+      display: none;
     }
 
-    .section-row{
-      margin-top:12px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
+    .section-row {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
     }
 
-    .legend{
-      margin-top:12px;
-      color:var(--muted);
-      font-size:.92rem;
-      display:flex;
-      flex-wrap:wrap;
-      gap:14px;
+    .legend {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
     }
 
-    .dot{
-      display:inline-block;
-      width:11px;
-      height:11px;
-      border-radius:999px;
-      margin-right:6px;
-      vertical-align:middle;
+    .dot {
+      display: inline-block;
+      width: 11px;
+      height: 11px;
+      border-radius: 999px;
+      margin-right: 6px;
+      vertical-align: middle;
     }
 
-    .dot.a{background:var(--accent)}
-    .dot.b{background:var(--danger)}
-
-    .chart-panel{
-      padding:14px;
+    .dot.a {
+      background: var(--accent);
     }
 
-    .stats{
-      display:grid;
-      grid-template-columns:repeat(4,minmax(0,1fr));
-      gap:10px;
-      margin-bottom:14px;
+    .dot.b {
+      background: var(--danger);
     }
 
-    .stat{
-      border:1px solid var(--line);
-      border-radius:12px;
-      padding:12px;
-      background:#12202a;
+    .chart-panel {
+      padding: 14px;
     }
 
-    .stat .k{
-      display:block;
-      font-size:.78rem;
-      color:var(--muted);
-      text-transform:uppercase;
-      letter-spacing:.03em;
-      font-weight:700;
-      margin-bottom:4px;
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
     }
 
-    .stat .v{
-      display:block;
-      font-size:1.12rem;
-      font-weight:800;
+    .stat {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      background: #12202a;
     }
 
-    .chart-wrap{
-      height:450px;
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:12px;
-      background:#0f1822;
+    .stat .k {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      font-weight: 700;
+      margin-bottom: 4px;
     }
 
-    .status{
-      margin-top:12px;
-      color:var(--muted);
-      font-size:.92rem;
+    .stat .v {
+      display: block;
+      font-size: 1.12rem;
+      font-weight: 800;
     }
 
-    .error{
-      color:#ff8b8b;
-      font-weight:700;
+    .chart-wrap {
+      height: 450px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      background: #0f1822;
     }
 
-    body.expanded-map .layout{
-      grid-template-columns:1fr;
+    .status {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.92rem;
     }
 
-    body.expanded-map .map-card{
-      order:1;
+    .error {
+      color: #ff8b8b;
+      font-weight: 700;
     }
 
-    body.expanded-map .chart-card{
-      order:2;
+    body.expanded-map .layout {
+      grid-template-columns: 1fr;
     }
 
-    body.expanded-map .map-stage{
-      aspect-ratio:16/7.5;
+    body.expanded-map .map-card {
+      order: 1;
     }
 
-    @media (max-width:1080px){
-      .layout{grid-template-columns:1fr}
-      .chart-wrap{height:360px}
+    body.expanded-map .chart-card {
+      order: 2;
     }
 
-    @media (max-width:720px){
-      .app{padding:12px}
-      .stats{grid-template-columns:1fr 1fr}
+    body.expanded-map .map-stage {
+      aspect-ratio: 16 / 7.5;
     }
 
-    @media (max-width:520px){
-      .stats{grid-template-columns:1fr}
-      .hotspot{
-        font-size:.8rem;
-        padding:7px 9px;
+    @media (max-width: 1080px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .chart-wrap {
+        height: 360px;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .app {
+        padding: 12px;
+      }
+
+      .stats {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .stats {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -367,11 +352,6 @@
 
       <div class="toolbar">
         <div class="toolbox">
-          <label for="areaSelect">Area</label>
-          <select id="areaSelect"></select>
-        </div>
-
-        <div class="toolbox">
           <label for="opacitySlider">DSM Opacity</label>
           <div class="slider-row">
             <input id="opacitySlider" type="range" min="0" max="100" value="55" />
@@ -385,7 +365,7 @@
       <section class="card map-card">
         <div class="card-head">
           <div>
-            <h2>Fixed Section Map</h2>
+            <h2>Area 8 Fixed Section Map</h2>
             <p>Blend ortho and DSM, then select a fixed section to view the height profile.</p>
           </div>
           <button id="expandMapBtn" type="button">Expand Map</button>
@@ -396,7 +376,6 @@
             <img id="orthoImage" class="ortho-layer" alt="Ortho" />
             <img id="dsmImage" class="dsm-layer" alt="DSM" />
             <img id="overlayImage" class="overlay-layer" alt="Section lines overlay" />
-            <div id="hotspots" class="hotspots"></div>
             <div id="lineMarker" class="line-marker"></div>
           </div>
 
@@ -446,108 +425,10 @@
       </section>
     </div>
   </div>
-<script>
-  const CONFIG = {
-    areas: {
-      area1: {
-        key: "area1",
-        label: "Area 1",
-        ortho: "assets/area1/ortho.jpg",
-        dsm: "assets/area1/dsm.png",
-        overlay: "assets/area1/section_lines.png",
-        csv: "assets/area1/area1_section_profiles.csv",
-        defaultSection: "A1-01",
-        sections: [
-          { id: "A1-01", label: "Section 1", markerX: 22, markerY: 72, path: [{x:18,y:72},{x:24,y:71},{x:30,y:70},{x:36,y:69},{x:42,y:68}] },
-          { id: "A1-02", label: "Section 2", markerX: 50, markerY: 55, path: [{x:44,y:55},{x:50,y:54},{x:56,y:53},{x:62,y:52},{x:68,y:51}] },
-          { id: "A1-03", label: "Section 3", markerX: 77, markerY: 38, path: [{x:71,y:38},{x:76,y:37},{x:81,y:36},{x:86,y:35},{x:91,y:34}] }
-        ]
-      },
-      area2: {
-        key: "area2",
-        label: "Area 2",
-        ortho: "assets/area2/ortho.jpg",
-        dsm: "assets/area2/dsm.png",
-        overlay: "assets/area2/section_lines.png",
-        csv: "assets/area2/area2_section_profiles.csv",
-        defaultSection: "A2-01",
-        sections: [
-          { id: "A2-01", label: "Section 1", markerX: 22, markerY: 72, path: [{x:18,y:72},{x:24,y:71},{x:30,y:70},{x:36,y:69},{x:42,y:68}] },
-          { id: "A2-02", label: "Section 2", markerX: 50, markerY: 55, path: [{x:44,y:55},{x:50,y:54},{x:56,y:53},{x:62,y:52},{x:68,y:51}] },
-          { id: "A2-03", label: "Section 3", markerX: 77, markerY: 38, path: [{x:71,y:38},{x:76,y:37},{x:81,y:36},{x:86,y:35},{x:91,y:34}] }
-        ]
-      },
-      area3: {
-        key: "area3",
-        label: "Area 3",
-        ortho: "assets/area3/ortho.jpg",
-        dsm: "assets/area3/dsm.png",
-        overlay: "assets/area3/section_lines.png",
-        csv: "assets/area3/area3_section_profiles.csv",
-        defaultSection: "A3-01",
-        sections: [
-          { id: "A3-01", label: "Section 1", markerX: 22, markerY: 72, path: [{x:18,y:72},{x:24,y:71},{x:30,y:70},{x:36,y:69},{x:42,y:68}] },
-          { id: "A3-02", label: "Section 2", markerX: 50, markerY: 55, path: [{x:44,y:55},{x:50,y:54},{x:56,y:53},{x:62,y:52},{x:68,y:51}] },
-          { id: "A3-03", label: "Section 3", markerX: 77, markerY: 38, path: [{x:71,y:38},{x:76,y:37},{x:81,y:36},{x:86,y:35},{x:91,y:34}] }
-        ]
-      },
-      area4: {
-        key: "area4",
-        label: "Area 4",
-        ortho: "assets/area4/ortho.jpg",
-        dsm: "assets/area4/dsm.png",
-        overlay: "assets/area4/section_lines.png",
-        csv: "assets/area4/area4_section_profiles.csv",
-        defaultSection: "A4-01",
-        sections: [
-          { id: "A4-01", label: "Section 1", markerX: 22, markerY: 72, path: [{x:18,y:72},{x:24,y:71},{x:30,y:70},{x:36,y:69},{x:42,y:68}] },
-          { id: "A4-02", label: "Section 2", markerX: 50, markerY: 55, path: [{x:44,y:55},{x:50,y:54},{x:56,y:53},{x:62,y:52},{x:68,y:51}] },
-          { id: "A4-03", label: "Section 3", markerX: 77, markerY: 38, path: [{x:71,y:38},{x:76,y:37},{x:81,y:36},{x:86,y:35},{x:91,y:34}] }
-        ]
-      },
-      area5: {
-        key: "area5",
-        label: "Area 5",
-        ortho: "assets/area5/ortho.jpg",
-        dsm: "assets/area5/dsm.png",
-        overlay: "assets/area5/section_lines.png",
-        csv: "assets/area5/area5_section_profiles.csv",
-        defaultSection: "A5-01",
-        sections: [
-          { id: "A5-01", label: "Section 1", markerX: 22, markerY: 72, path: [{x:18,y:72},{x:24,y:71},{x:30,y:70},{x:36,y:69},{x:42,y:68}] },
-          { id: "A5-02", label: "Section 2", markerX: 50, markerY: 55, path: [{x:44,y:55},{x:50,y:54},{x:56,y:53},{x:62,y:52},{x:68,y:51}] },
-          { id: "A5-03", label: "Section 3", markerX: 77, markerY: 38, path: [{x:71,y:38},{x:76,y:37},{x:81,y:36},{x:86,y:35},{x:91,y:34}] }
-        ]
-      },
-      area6: {
-        key: "area6",
-        label: "Area 6",
-        ortho: "assets/area6/ortho.jpg",
-        dsm: "assets/area6/dsm.png",
-        overlay: "assets/area6/section_lines.png",
-        csv: "assets/area6/area6_section_profiles.csv",
-        defaultSection: "A6-01",
-        sections: [
-          { id: "A6-01", label: "Section 1", markerX: 22, markerY: 72, path: [{x:18,y:72},{x:24,y:71},{x:30,y:70},{x:36,y:69},{x:42,y:68}] },
-          { id: "A6-02", label: "Section 2", markerX: 50, markerY: 55, path: [{x:44,y:55},{x:50,y:54},{x:56,y:53},{x:62,y:52},{x:68,y:51}] },
-          { id: "A6-03", label: "Section 3", markerX: 77, markerY: 38, path: [{x:71,y:38},{x:76,y:37},{x:81,y:36},{x:86,y:35},{x:91,y:34}] }
-        ]
-      },
-      area7: {
-        key: "area7",
-        label: "Area 7",
-        ortho: "assets/area7/ortho.jpg",
-        dsm: "assets/area7/dsm.png",
-        overlay: "assets/area7/section_lines.png",
-        csv: "assets/area7/area7_section_profiles.csv",
-        defaultSection: "A7-01",
-        sections: [
-          { id: "A7-01", label: "Section 1", markerX: 22, markerY: 72, path: [{x:18,y:72},{x:24,y:71},{x:30,y:70},{x:36,y:69},{x:42,y:68}] },
-          { id: "A7-02", label: "Section 2", markerX: 50, markerY: 55, path: [{x:44,y:55},{x:50,y:54},{x:56,y:53},{x:62,y:52},{x:68,y:51}] },
-          { id: "A7-03", label: "Section 3", markerX: 77, markerY: 38, path: [{x:71,y:38},{x:76,y:37},{x:81,y:36},{x:86,y:35},{x:91,y:34}] }
-        ]
-      },
-      area8: {
+
+  <script>
+    const CONFIG = {
+      area: {
         key: "area8",
         label: "Area 8",
         ortho: "assets/area8/ortho.jpg",
@@ -556,25 +437,49 @@
         csv: "assets/area8/area8_section_profiles.csv",
         defaultSection: "A8-01",
         sections: [
-          { id: "A8-01", label: "Section 1", markerX: 15, markerY: 46, path: [{x:16,y:22},{x:14,y:71}] },
-          { id: "A8-02", label: "Section 2", markerX: 52, markerY: 42, path: [{x:49,y:7},{x:54,y:76}] },
-          { id: "A8-03", label: "Section 3", markerX: 84, markerY: 61, path: [{x:93,y:34},{x:76,y:89}] }
+          {
+            id: "A8-01",
+            label: "Section 1",
+            path: [
+              { x: 16, y: 22 },
+              { x: 14, y: 71 }
+            ]
+          },
+          {
+            id: "A8-02",
+            label: "Section 2",
+            path: [
+              { x: 49, y: 7 },
+              { x: 54, y: 76 }
+            ]
+          },
+          {
+            id: "A8-03",
+            label: "Section 3",
+            path: [
+              { x: 93, y: 34 },
+              { x: 76, y: 89 }
+            ]
+          }
         ]
-      }
-    },
-    defaultArea: "area8",
-    defaultOpacity: 55
-  };
-</script>
+      },
+      defaultOpacity: 55
+    };
+
+    const state = {
+      sectionId: CONFIG.area.defaultSection,
+      rows: [],
+      chart: null,
+      hoverIndex: null,
+      expanded: false
+    };
 
     const els = {
-      areaSelect: document.getElementById("areaSelect"),
       opacitySlider: document.getElementById("opacitySlider"),
       opacityValue: document.getElementById("opacityValue"),
       orthoImage: document.getElementById("orthoImage"),
       dsmImage: document.getElementById("dsmImage"),
       overlayImage: document.getElementById("overlayImage"),
-      hotspots: document.getElementById("hotspots"),
       sectionButtons: document.getElementById("sectionButtons"),
       lineMarker: document.getElementById("lineMarker"),
       chartTitle: document.getElementById("chartTitle"),
@@ -588,21 +493,15 @@
       expandMapBtn: document.getElementById("expandMapBtn")
     };
 
-    function currentArea() {
-      return CONFIG.areas[state.areaKey];
-    }
-
-    function currentSectionMeta() {
-      return currentArea().sections.find(s => s.id === state.sectionId) || null;
-    }
-
     function splitCsvLine(line) {
       const values = [];
       let current = "";
       let inQuotes = false;
+
       for (let i = 0; i < line.length; i++) {
         const ch = line[i];
         const next = line[i + 1];
+
         if (ch === '"' && inQuotes && next === '"') {
           current += '"';
           i++;
@@ -615,6 +514,7 @@
           current += ch;
         }
       }
+
       values.push(current);
       return values;
     }
@@ -622,7 +522,9 @@
     function parseCsv(text) {
       const lines = text.trim().split(/\r?\n/).filter(Boolean);
       if (!lines.length) return [];
+
       const headers = splitCsvLine(lines[0]).map(h => h.trim());
+
       return lines.slice(1).map(line => {
         const cols = splitCsvLine(line);
         const row = {};
@@ -646,53 +548,20 @@
       els.statusText.classList.toggle("error", isError);
     }
 
-    function populateAreaDropdown() {
-      els.areaSelect.innerHTML = "";
-      Object.values(CONFIG.areas).forEach(area => {
-        const opt = document.createElement("option");
-        opt.value = area.key;
-        opt.textContent = area.label;
-        els.areaSelect.appendChild(opt);
-      });
-      els.areaSelect.value = state.areaKey;
-    }
-
-    function setDefaultSectionForArea() {
-      const area = currentArea();
-      state.sectionId = area.defaultSection || (area.sections[0] ? area.sections[0].id : null);
-      state.hoverIndex = null;
-    }
-
     function updateOpacity() {
       const opacity = Number(els.opacitySlider.value) / 100;
       els.dsmImage.style.opacity = opacity;
       els.opacityValue.textContent = `${els.opacitySlider.value}%`;
     }
 
-    function renderMap() {
-      const area = currentArea();
-      els.orthoImage.src = area.ortho;
-      els.dsmImage.src = area.dsm;
-      els.overlayImage.src = area.overlay;
+    function getCurrentSection() {
+      return CONFIG.area.sections.find(s => s.id === state.sectionId) || null;
+    }
 
-      els.hotspots.innerHTML = "";
-      area.sections.forEach(section => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "hotspot" + (section.id === state.sectionId ? " active" : "");
-        btn.style.left = `${section.markerX}%`;
-        btn.style.top = `${section.markerY}%`;
-        btn.textContent = section.label;
-        btn.addEventListener("click", () => {
-          state.sectionId = section.id;
-          state.hoverIndex = null;
-          renderAll();
-        });
-        els.hotspots.appendChild(btn);
-      });
-
+    function renderSectionButtons() {
       els.sectionButtons.innerHTML = "";
-      area.sections.forEach(section => {
+
+      CONFIG.area.sections.forEach(section => {
         const btn = document.createElement("button");
         btn.type = "button";
         btn.textContent = section.label;
@@ -704,8 +573,6 @@
         });
         els.sectionButtons.appendChild(btn);
       });
-
-      updateMarker();
     }
 
     function getSectionRows() {
@@ -725,12 +592,14 @@
     function pointAlongPath(path, t) {
       if (!path || !path.length) return null;
       if (path.length === 1) return path[0];
+
       const segments = path.length - 1;
       const scaled = t * segments;
       const segIndex = Math.min(Math.floor(scaled), segments - 1);
       const localT = scaled - segIndex;
       const p1 = path[segIndex];
       const p2 = path[segIndex + 1];
+
       return {
         x: p1.x + (p2.x - p1.x) * localT,
         y: p1.y + (p2.y - p1.y) * localT
@@ -738,7 +607,7 @@
     }
 
     function updateMarker() {
-      const section = currentSectionMeta();
+      const section = getCurrentSection();
       const rows = getSectionRows();
 
       if (!section || !rows.length || !section.path || !section.path.length) {
@@ -771,14 +640,13 @@
     }
 
     function renderChart() {
-      const area = currentArea();
-      const section = currentSectionMeta();
       const rows = getSectionRows();
       const validRows = rows.filter(r => r.height_m !== null);
+      const section = getCurrentSection();
 
-      els.chartTitle.textContent = `${area.label} – ${section ? section.label : "Section Profile"}`;
+      els.chartTitle.textContent = `${CONFIG.area.label} – ${section ? section.label : "Section Profile"}`;
       els.chartSubtitle.textContent = "Height profile sampled along the selected fixed section line.";
-      els.statArea.textContent = area.label;
+      els.statArea.textContent = CONFIG.area.label;
       els.statSection.textContent = section ? section.label : "—";
       els.statMin.textContent = validRows.length ? `${Math.min(...validRows.map(r => r.height_m)).toFixed(2)} m` : "—";
       els.statMax.textContent = validRows.length ? `${Math.max(...validRows.map(r => r.height_m)).toFixed(2)} m` : "—";
@@ -786,7 +654,7 @@
       if (!rows.length) {
         destroyChart();
         updateMarker();
-        setStatus(`No profile rows found for ${area.label} ${section ? section.label : ""}.`, true);
+        setStatus(`No profile rows found for ${section ? section.label : "this section"}.`, true);
         return;
       }
 
@@ -798,15 +666,17 @@
           type: "line",
           data: {
             labels,
-            datasets: [{
-              label: "Height (m)",
-              data: values,
-              borderWidth: 2,
-              pointRadius: 0,
-              pointHoverRadius: 5,
-              tension: 0.15,
-              spanGaps: false
-            }]
+            datasets: [
+              {
+                label: "Height (m)",
+                data: values,
+                borderWidth: 2,
+                pointRadius: 0,
+                pointHoverRadius: 5,
+                tension: 0.15,
+                spanGaps: false
+              }
+            ]
           },
           options: {
             responsive: true,
@@ -873,30 +743,33 @@
       }
 
       updateMarker();
-      setStatus(`Showing ${area.label}, ${section ? section.label : state.sectionId}. ${validRows.length} valid sampled points loaded.`);
+      setStatus(`Showing ${CONFIG.area.label}, ${section ? section.label : state.sectionId}. ${validRows.length} valid sampled points loaded.`);
     }
 
     function renderAll() {
-      renderMap();
+      renderSectionButtons();
       renderChart();
     }
 
-    async function loadAreaData() {
-      const area = currentArea();
-      setStatus(`Loading ${area.label} data…`);
+    async function loadData() {
+      setStatus(`Loading ${CONFIG.area.label} data…`);
       els.chartSubtitle.textContent = "Loading data…";
 
       try {
-        const response = await fetch(area.csv, { cache: "no-store" });
+        els.orthoImage.src = CONFIG.area.ortho;
+        els.dsmImage.src = CONFIG.area.dsm;
+        els.overlayImage.src = CONFIG.area.overlay;
+
+        const response = await fetch(CONFIG.area.csv, { cache: "no-store" });
         if (!response.ok) {
-          throw new Error(`Could not load ${area.csv}`);
+          throw new Error(`Could not load ${CONFIG.area.csv}`);
         }
 
         const csvText = await response.text();
         state.rows = parseCsv(csvText);
 
         if (!state.rows.length) {
-          throw new Error(`CSV loaded but no rows were found in ${area.csv}`);
+          throw new Error("CSV loaded but no rows were found.");
         }
 
         renderAll();
@@ -904,18 +777,36 @@
         console.error(error);
         state.rows = [];
         destroyChart();
-        renderMap();
-        els.chartTitle.textContent = `${area.label} – Section Profile`;
+        renderSectionButtons();
+        els.chartTitle.textContent = `${CONFIG.area.label} – Section Profile`;
         els.chartSubtitle.textContent = "Could not load this area's profile data.";
-        els.statArea.textContent = area.label;
+        els.statArea.textContent = CONFIG.area.label;
         els.statSection.textContent = "—";
         els.statMin.textContent = "—";
         els.statMax.textContent = "—";
-        setStatus(`Could not load ${area.label}. Check the CSV path and deployed file names.`, true);
+        setStatus(`Could not load Area 8. Check the file paths and deployed file names.`, true);
       }
     }
 
-    function bindImageDebug() {
+    function toggleExpandedMap() {
+      state.expanded = !state.expanded;
+      document.body.classList.toggle("expanded-map", state.expanded);
+      els.expandMapBtn.textContent = state.expanded ? "Collapse Map" : "Expand Map";
+
+      setTimeout(() => {
+        if (state.chart) state.chart.resize();
+      }, 250);
+    }
+
+    function bindEvents() {
+      els.opacitySlider.addEventListener("input", updateOpacity);
+      els.expandMapBtn.addEventListener("click", toggleExpandedMap);
+
+      els.profileChart.addEventListener("mouseleave", () => {
+        state.hoverIndex = null;
+        updateMarker();
+      });
+
       [els.orthoImage, els.dsmImage, els.overlayImage].forEach(img => {
         img.addEventListener("error", () => {
           console.error("Image failed to load:", img.src);
@@ -923,40 +814,11 @@
       });
     }
 
-    function toggleExpandedMap() {
-      state.expanded = !state.expanded;
-      document.body.classList.toggle("expanded-map", state.expanded);
-      els.expandMapBtn.textContent = state.expanded ? "Collapse Map" : "Expand Map";
-      setTimeout(() => {
-        if (state.chart) state.chart.resize();
-      }, 250);
-    }
-
-    function bindEvents() {
-      els.areaSelect.addEventListener("change", async (e) => {
-        state.areaKey = e.target.value;
-        setDefaultSectionForArea();
-        await loadAreaData();
-      });
-
-      els.opacitySlider.addEventListener("input", updateOpacity);
-
-      els.profileChart.addEventListener("mouseleave", () => {
-        state.hoverIndex = null;
-        updateMarker();
-      });
-
-      els.expandMapBtn.addEventListener("click", toggleExpandedMap);
-    }
-
     async function init() {
-      populateAreaDropdown();
       els.opacitySlider.value = CONFIG.defaultOpacity;
       bindEvents();
-      bindImageDebug();
-      setDefaultSectionForArea();
       updateOpacity();
-      await loadAreaData();
+      await loadData();
     }
 
     init();
