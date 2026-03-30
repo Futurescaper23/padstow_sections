@@ -446,138 +446,126 @@
       </section>
     </div>
   </div>
-
-  <script>
-    const CONFIG = {
-      areas: {
-        area1: {
-          key: "area1",
-          label: "Area 1",
-          ortho: "assets/area1/ortho.jpg",
-          dsm: "assets/area1/dsm.png",
-          overlay: "assets/area1/section_lines.png",
-          csv: "assets/area1/area1_section_profiles.csv",
-          defaultSection: "A1-01",
-          sections: [
-            { id: "A1-01", label: "Section 1", markerX: 22, markerY: 72, path: [{x:18,y:72},{x:24,y:71},{x:30,y:70},{x:36,y:69},{x:42,y:68}] },
-            { id: "A1-02", label: "Section 2", markerX: 50, markerY: 55, path: [{x:44,y:55},{x:50,y:54},{x:56,y:53},{x:62,y:52},{x:68,y:51}] },
-            { id: "A1-03", label: "Section 3", markerX: 77, markerY: 38, path: [{x:71,y:38},{x:76,y:37},{x:81,y:36},{x:86,y:35},{x:91,y:34}] }
-          ]
-        },
-        area2: {
-          key: "area2",
-          label: "Area 2",
-          ortho: "assets/area2/ortho.jpg",
-          dsm: "assets/area2/dsm.png",
-          overlay: "assets/area2/section_lines.png",
-          csv: "assets/area2/area2_section_profiles.csv",
-          defaultSection: "A2-01",
-          sections: [
-            { id: "A2-01", label: "Section 1", markerX: 22, markerY: 72, path: [{x:18,y:72},{x:24,y:71},{x:30,y:70},{x:36,y:69},{x:42,y:68}] },
-            { id: "A2-02", label: "Section 2", markerX: 50, markerY: 55, path: [{x:44,y:55},{x:50,y:54},{x:56,y:53},{x:62,y:52},{x:68,y:51}] },
-            { id: "A2-03", label: "Section 3", markerX: 77, markerY: 38, path: [{x:71,y:38},{x:76,y:37},{x:81,y:36},{x:86,y:35},{x:91,y:34}] }
-          ]
-        },
-        area3: {
-          key: "area3",
-          label: "Area 3",
-          ortho: "assets/area3/ortho.jpg",
-          dsm: "assets/area3/dsm.png",
-          overlay: "assets/area3/section_lines.png",
-          csv: "assets/area3/area3_section_profiles.csv",
-          defaultSection: "A3-01",
-          sections: [
-            { id: "A3-01", label: "Section 1", markerX: 22, markerY: 72, path: [{x:18,y:72},{x:24,y:71},{x:30,y:70},{x:36,y:69},{x:42,y:68}] },
-            { id: "A3-02", label: "Section 2", markerX: 50, markerY: 55, path: [{x:44,y:55},{x:50,y:54},{x:56,y:53},{x:62,y:52},{x:68,y:51}] },
-            { id: "A3-03", label: "Section 3", markerX: 77, markerY: 38, path: [{x:71,y:38},{x:76,y:37},{x:81,y:36},{x:86,y:35},{x:91,y:34}] }
-          ]
-        },
-        area4: {
-          key: "area4",
-          label: "Area 4",
-          ortho: "assets/area4/ortho.jpg",
-          dsm: "assets/area4/dsm.png",
-          overlay: "assets/area4/section_lines.png",
-          csv: "assets/area4/area4_section_profiles.csv",
-          defaultSection: "A4-01",
-          sections: [
-            { id: "A4-01", label: "Section 1", markerX: 22, markerY: 72, path: [{x:18,y:72},{x:24,y:71},{x:30,y:70},{x:36,y:69},{x:42,y:68}] },
-            { id: "A4-02", label: "Section 2", markerX: 50, markerY: 55, path: [{x:44,y:55},{x:50,y:54},{x:56,y:53},{x:62,y:52},{x:68,y:51}] },
-            { id: "A4-03", label: "Section 3", markerX: 77, markerY: 38, path: [{x:71,y:38},{x:76,y:37},{x:81,y:36},{x:86,y:35},{x:91,y:34}] }
-          ]
-        },
-        area5: {
-          key: "area5",
-          label: "Area 5",
-          ortho: "assets/area5/ortho.jpg",
-          dsm: "assets/area5/dsm.png",
-          overlay: "assets/area5/section_lines.png",
-          csv: "assets/area5/area5_section_profiles.csv",
-          defaultSection: "A5-01",
-          sections: [
-            { id: "A5-01", label: "Section 1", markerX: 22, markerY: 72, path: [{x:18,y:72},{x:24,y:71},{x:30,y:70},{x:36,y:69},{x:42,y:68}] },
-            { id: "A5-02", label: "Section 2", markerX: 50, markerY: 55, path: [{x:44,y:55},{x:50,y:54},{x:56,y:53},{x:62,y:52},{x:68,y:51}] },
-            { id: "A5-03", label: "Section 3", markerX: 77, markerY: 38, path: [{x:71,y:38},{x:76,y:37},{x:81,y:36},{x:86,y:35},{x:91,y:34}] }
-          ]
-        },
-        area6: {
-          key: "area6",
-          label: "Area 6",
-          ortho: "assets/area6/ortho.jpg",
-          dsm: "assets/area6/dsm.png",
-          overlay: "assets/area6/section_lines.png",
-          csv: "assets/area6/area6_section_profiles.csv",
-          defaultSection: "A6-01",
-          sections: [
-            { id: "A6-01", label: "Section 1", markerX: 22, markerY: 72, path: [{x:18,y:72},{x:24,y:71},{x:30,y:70},{x:36,y:69},{x:42,y:68}] },
-            { id: "A6-02", label: "Section 2", markerX: 50, markerY: 55, path: [{x:44,y:55},{x:50,y:54},{x:56,y:53},{x:62,y:52},{x:68,y:51}] },
-            { id: "A6-03", label: "Section 3", markerX: 77, markerY: 38, path: [{x:71,y:38},{x:76,y:37},{x:81,y:36},{x:86,y:35},{x:91,y:34}] }
-          ]
-        },
-        area7: {
-          key: "area7",
-          label: "Area 7",
-          ortho: "assets/area7/ortho.jpg",
-          dsm: "assets/area7/dsm.png",
-          overlay: "assets/area7/section_lines.png",
-          csv: "assets/area7/area7_section_profiles.csv",
-          defaultSection: "A7-01",
-          sections: [
-            { id: "A7-01", label: "Section 1", markerX: 22, markerY: 72, path: [{x:18,y:72},{x:24,y:71},{x:30,y:70},{x:36,y:69},{x:42,y:68}] },
-            { id: "A7-02", label: "Section 2", markerX: 50, markerY: 55, path: [{x:44,y:55},{x:50,y:54},{x:56,y:53},{x:62,y:52},{x:68,y:51}] },
-            { id: "A7-03", label: "Section 3", markerX: 77, markerY: 38, path: [{x:71,y:38},{x:76,y:37},{x:81,y:36},{x:86,y:35},{x:91,y:34}] }
-          ]
-        },
-area8: {
-  key: "area8",
-  label: "Area 8",
-  ortho: "assets/area8/ortho.jpg",
-  dsm: "assets/area8/dsm.png",
-  overlay: "assets/area8/section_lines.png",
-  csv: "assets/area8/area8_section_profiles.csv",
-  defaultSection: "A8-01",
-  sections: [
-    { id: "A8-01", label: "Section 1", markerX: 15, markerY: 46, path: [{x:16,y:22},{x:14,y:71}] },
-    { id: "A8-02", label: "Section 2", markerX: 52, markerY: 42, path: [{x:49,y:7},{x:54,y:76}] },
-    { id: "A8-03", label: "Section 3", markerX: 84, markerY: 61, path: [{x:93,y:34},{x:76,y:89}] }
-  ]
-}
-        
-          ]
-        }
+<script>
+  const CONFIG = {
+    areas: {
+      area1: {
+        key: "area1",
+        label: "Area 1",
+        ortho: "assets/area1/ortho.jpg",
+        dsm: "assets/area1/dsm.png",
+        overlay: "assets/area1/section_lines.png",
+        csv: "assets/area1/area1_section_profiles.csv",
+        defaultSection: "A1-01",
+        sections: [
+          { id: "A1-01", label: "Section 1", markerX: 22, markerY: 72, path: [{x:18,y:72},{x:24,y:71},{x:30,y:70},{x:36,y:69},{x:42,y:68}] },
+          { id: "A1-02", label: "Section 2", markerX: 50, markerY: 55, path: [{x:44,y:55},{x:50,y:54},{x:56,y:53},{x:62,y:52},{x:68,y:51}] },
+          { id: "A1-03", label: "Section 3", markerX: 77, markerY: 38, path: [{x:71,y:38},{x:76,y:37},{x:81,y:36},{x:86,y:35},{x:91,y:34}] }
+        ]
       },
-      defaultArea: "area8",
-      defaultOpacity: 55
-    };
-
-    const state = {
-      areaKey: CONFIG.defaultArea,
-      sectionId: null,
-      rows: [],
-      chart: null,
-      hoverIndex: null,
-      expanded: false
-    };
+      area2: {
+        key: "area2",
+        label: "Area 2",
+        ortho: "assets/area2/ortho.jpg",
+        dsm: "assets/area2/dsm.png",
+        overlay: "assets/area2/section_lines.png",
+        csv: "assets/area2/area2_section_profiles.csv",
+        defaultSection: "A2-01",
+        sections: [
+          { id: "A2-01", label: "Section 1", markerX: 22, markerY: 72, path: [{x:18,y:72},{x:24,y:71},{x:30,y:70},{x:36,y:69},{x:42,y:68}] },
+          { id: "A2-02", label: "Section 2", markerX: 50, markerY: 55, path: [{x:44,y:55},{x:50,y:54},{x:56,y:53},{x:62,y:52},{x:68,y:51}] },
+          { id: "A2-03", label: "Section 3", markerX: 77, markerY: 38, path: [{x:71,y:38},{x:76,y:37},{x:81,y:36},{x:86,y:35},{x:91,y:34}] }
+        ]
+      },
+      area3: {
+        key: "area3",
+        label: "Area 3",
+        ortho: "assets/area3/ortho.jpg",
+        dsm: "assets/area3/dsm.png",
+        overlay: "assets/area3/section_lines.png",
+        csv: "assets/area3/area3_section_profiles.csv",
+        defaultSection: "A3-01",
+        sections: [
+          { id: "A3-01", label: "Section 1", markerX: 22, markerY: 72, path: [{x:18,y:72},{x:24,y:71},{x:30,y:70},{x:36,y:69},{x:42,y:68}] },
+          { id: "A3-02", label: "Section 2", markerX: 50, markerY: 55, path: [{x:44,y:55},{x:50,y:54},{x:56,y:53},{x:62,y:52},{x:68,y:51}] },
+          { id: "A3-03", label: "Section 3", markerX: 77, markerY: 38, path: [{x:71,y:38},{x:76,y:37},{x:81,y:36},{x:86,y:35},{x:91,y:34}] }
+        ]
+      },
+      area4: {
+        key: "area4",
+        label: "Area 4",
+        ortho: "assets/area4/ortho.jpg",
+        dsm: "assets/area4/dsm.png",
+        overlay: "assets/area4/section_lines.png",
+        csv: "assets/area4/area4_section_profiles.csv",
+        defaultSection: "A4-01",
+        sections: [
+          { id: "A4-01", label: "Section 1", markerX: 22, markerY: 72, path: [{x:18,y:72},{x:24,y:71},{x:30,y:70},{x:36,y:69},{x:42,y:68}] },
+          { id: "A4-02", label: "Section 2", markerX: 50, markerY: 55, path: [{x:44,y:55},{x:50,y:54},{x:56,y:53},{x:62,y:52},{x:68,y:51}] },
+          { id: "A4-03", label: "Section 3", markerX: 77, markerY: 38, path: [{x:71,y:38},{x:76,y:37},{x:81,y:36},{x:86,y:35},{x:91,y:34}] }
+        ]
+      },
+      area5: {
+        key: "area5",
+        label: "Area 5",
+        ortho: "assets/area5/ortho.jpg",
+        dsm: "assets/area5/dsm.png",
+        overlay: "assets/area5/section_lines.png",
+        csv: "assets/area5/area5_section_profiles.csv",
+        defaultSection: "A5-01",
+        sections: [
+          { id: "A5-01", label: "Section 1", markerX: 22, markerY: 72, path: [{x:18,y:72},{x:24,y:71},{x:30,y:70},{x:36,y:69},{x:42,y:68}] },
+          { id: "A5-02", label: "Section 2", markerX: 50, markerY: 55, path: [{x:44,y:55},{x:50,y:54},{x:56,y:53},{x:62,y:52},{x:68,y:51}] },
+          { id: "A5-03", label: "Section 3", markerX: 77, markerY: 38, path: [{x:71,y:38},{x:76,y:37},{x:81,y:36},{x:86,y:35},{x:91,y:34}] }
+        ]
+      },
+      area6: {
+        key: "area6",
+        label: "Area 6",
+        ortho: "assets/area6/ortho.jpg",
+        dsm: "assets/area6/dsm.png",
+        overlay: "assets/area6/section_lines.png",
+        csv: "assets/area6/area6_section_profiles.csv",
+        defaultSection: "A6-01",
+        sections: [
+          { id: "A6-01", label: "Section 1", markerX: 22, markerY: 72, path: [{x:18,y:72},{x:24,y:71},{x:30,y:70},{x:36,y:69},{x:42,y:68}] },
+          { id: "A6-02", label: "Section 2", markerX: 50, markerY: 55, path: [{x:44,y:55},{x:50,y:54},{x:56,y:53},{x:62,y:52},{x:68,y:51}] },
+          { id: "A6-03", label: "Section 3", markerX: 77, markerY: 38, path: [{x:71,y:38},{x:76,y:37},{x:81,y:36},{x:86,y:35},{x:91,y:34}] }
+        ]
+      },
+      area7: {
+        key: "area7",
+        label: "Area 7",
+        ortho: "assets/area7/ortho.jpg",
+        dsm: "assets/area7/dsm.png",
+        overlay: "assets/area7/section_lines.png",
+        csv: "assets/area7/area7_section_profiles.csv",
+        defaultSection: "A7-01",
+        sections: [
+          { id: "A7-01", label: "Section 1", markerX: 22, markerY: 72, path: [{x:18,y:72},{x:24,y:71},{x:30,y:70},{x:36,y:69},{x:42,y:68}] },
+          { id: "A7-02", label: "Section 2", markerX: 50, markerY: 55, path: [{x:44,y:55},{x:50,y:54},{x:56,y:53},{x:62,y:52},{x:68,y:51}] },
+          { id: "A7-03", label: "Section 3", markerX: 77, markerY: 38, path: [{x:71,y:38},{x:76,y:37},{x:81,y:36},{x:86,y:35},{x:91,y:34}] }
+        ]
+      },
+      area8: {
+        key: "area8",
+        label: "Area 8",
+        ortho: "assets/area8/ortho.jpg",
+        dsm: "assets/area8/dsm.png",
+        overlay: "assets/area8/section_lines.png",
+        csv: "assets/area8/area8_section_profiles.csv",
+        defaultSection: "A8-01",
+        sections: [
+          { id: "A8-01", label: "Section 1", markerX: 15, markerY: 46, path: [{x:16,y:22},{x:14,y:71}] },
+          { id: "A8-02", label: "Section 2", markerX: 52, markerY: 42, path: [{x:49,y:7},{x:54,y:76}] },
+          { id: "A8-03", label: "Section 3", markerX: 84, markerY: 61, path: [{x:93,y:34},{x:76,y:89}] }
+        ]
+      }
+    },
+    defaultArea: "area8",
+    defaultOpacity: 55
+  };
+</script>
 
     const els = {
       areaSelect: document.getElementById("areaSelect"),
