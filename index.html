@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Padstow Estuary Section Profiler</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root{
+      --bg:#f4f7fb;
+      --panel:#ffffff;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --line:#d8e1eb;
+      --accent:#0f766e;
+      --accent-dark:#0b5d57;
+      --danger:#b91c1c;
+      --shadow:0 10px 28px rgba(0,0,0,0.08);
+      --radius:18px;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    .app{
+      max-width:1500px;
+      margin:0 auto;
+      padding:20px;
+    }
+
+    .header{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:18px;
+      flex-wrap:wrap;
+      margin-bottom:18px;
+    }
+
+    .title-wrap h1{
+      margin:0 0 6px;
+      font-size:1.9rem;
+      line-height:1.05;
+    }
+
+    .title-wrap p{
+      margin:0;
+      color:var(--muted);
+      font-size:0.98rem;
+    }
+
+    .toolbar{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:stretch;
+    }
+
+    .toolbox{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:10px 12px;
+      box-shadow:var(--shadow);
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width:160px;
+    }
+
+    .toolbox label{
+      font-size:0.78rem;
+      text-transform:uppercase;
+      letter-spacing:.03em;
+      color:var(--muted);
+      font-weight:700;
+    }
+
+    select{
+      border:1px solid var(--line);
+      border-radius:10px;
+      padding:10px 12px;
+      font-size:1rem;
+      background:#fff;
+      color:var(--text);
+      cursor:pointer;
+    }
+
+    .toggle-row{
+      display:flex;
+      gap:8px;
+    }
+
+    button{
+      border:1px solid var(--line);
+      border-radius:10px;
+      padding:10px 14px;
+      background:#fff;
+      color:var(--text);
+      cursor:pointer;
+      font-weight:700;
+      transition:.2s ease;
+    }
+
+    button:hover{
+      border-color:#b8c7d8;
+    }
+
+    button.active{
+      background:var(--accent);
+      color:#fff;
+      border-color:var(--accent);
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns:1.12fr .88fr;
+      gap:18px;
+    }
+
+    .card{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+
+    .card-head{
+      padding:16px 18px 12px;
+      border-bottom:1px solid var(--line);
+    }
+
+    .card-head h2{
+      margin:0 0 4px;
+      font-size:1.15rem;
+    }
+
+    .card-head p{
+      margin:0;
+      color:var(--muted);
+      font-size:.95rem;
+    }
+
+    .map-panel{
+      padding:14px;
+    }
+
+    .map-stage{
+      position:relative;
+      width:100%;
+      aspect-ratio:16/10;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#eef3f8;
+      overflow:hidden;
+    }
+
+    .map-stage img{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      user-select:none;
+      -webkit-user-drag:none;
+      pointer-events:none;
+    }
+
+    .base-layer{z-index:1}
+    .overlay-layer{z-index:2}
+
+    .hotspots{
+      position:absolute;
+      inset:0;
+      z-index:3;
+      pointer-events:none;
+    }
+
+    .hotspot{
+      position:absolute;
+      transform:translate(-50%,-50%);
+      pointer-events:auto;
+      border:2px solid rgba(255,255,255,.95);
+      background:rgba(15,118,110,.94);
+      color:#fff;
+      border-radius:999px;
+      padding:8px 11px;
+      font-size:.9rem;
+      font-weight:700;
+      cursor:pointer;
+      box-shadow:0 6px 18px rgba(0,0,0,.16);
+      white-space:nowrap;
+    }
+
+    .hotspot.active{
+      background:var(--danger);
+    }
+
+    .section-row{
+      margin-top:12px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    .legend{
+      margin-top:12px;
+      color:var(--muted);
+      font-size:.92rem;
+      display:flex;
+      flex-wrap:wrap;
+      gap:14px;
+    }
+
+    .dot{
+      display:inline-block;
+      width:11px;
+      height:11px;
+      border-radius:999px;
+      margin-right:6px;
+      vertical-align:middle;
+    }
+
+    .dot.a{background:var(--accent)}
+    .dot.b{background:var(--danger)}
+
+    .chart-panel{
+      padding:14px;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:10px;
+      margin-bottom:14px;
+    }
+
+    .stat{
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px;
+      background:#fbfcff;
+    }
+
+    .stat .k{
+      display:block;
+      font-size:.78rem;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.03em;
+      font-weight:700;
+      margin-bottom:4px;
+    }
+
+    .stat .v{
+      display:block;
+      font-size:1.12rem;
+      font-weight:800;
+    }
+
+    .chart-wrap{
+      height:450px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px;
+      background:#fff;
+    }
+
+    .status{
+      margin-top:12px;
+      color:var(--muted);
+      font-size:.92rem;
+    }
+
+    .error{
+      color:var(--danger);
+      font-weight:700;
+    }
+
+    @media (max-width:1080px){
+      .layout{grid-template-columns:1fr}
+      .chart-wrap{height:360px}
+    }
+
+    @media (max-width:720px){
+      .app{padding:12px}
+      .stats{grid-template-columns:1fr 1fr}
+    }
+
+    @media (max-width:520px){
+      .stats{grid-template-columns:1fr}
+      .hotspot{
+        font-size:.8rem;
+        padding:7px 9px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="header">
+      <div class="title-wrap">
+        <h1>Padstow Estuary Section Profiler</h1>
+        <p>Simple fixed-section viewer for client use. Fast loading, clear layout, and no experimental tools.</p>
+      </div>
+
+      <div class="toolbar">
+        <div class="toolbox">
+          <label for="areaSelect">Area</label>
+          <select id="areaSelect"></select>
+        </div>
+
+        <div class="toolbox">
+          <label>Basemap</label>
+          <div class="toggle-row">
+            <button id="orthoBtn" type="button" class="active">Ortho</button>
+            <button id="dsmBtn" type="button">DSM</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="layout">
+      <section class="card">
+        <div class="card-head">
+          <h2>Fixed Section Map</h2>
+          <p>Choose an area, then select one of the fixed sections to view the terrain profile.</p>
+        </div>
+
+        <div class="map-panel">
+          <div class="map-stage">
+            <img id="baseImage" class="base-layer" alt="Basemap" />
+            <img id="overlayImage" class="overlay-layer" alt="Section lines overlay" />
+            <div id="hotspots" class="hotspots"></div>
+          </div>
+
+          <div id="sectionButtons" class="section-row"></div>
+
+          <div class="legend">
+            <span><span class="dot a"></span>Fixed section</span>
+            <span><span class="dot b"></span>Selected section</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <h2 id="chartTitle">Section Profile</h2>
+          <p id="chartSubtitle">Loading data…</p>
+        </div>
+
+        <div class="chart-panel">
+          <div class="stats">
+            <div class="stat">
+              <span class="k">Area</span>
+              <span id="statArea" class="v">—</span>
+            </div>
+            <div class="stat">
+              <span class="k">Section</span>
+              <span id="statSection" class="v">—</span>
+            </div>
+            <div class="stat">
+              <span class="k">Min Height</span>
+              <span id="statMin" class="v">—</span>
+            </div>
+            <div class="stat">
+              <span class="k">Max Height</span>
+              <span id="statMax" class="v">—</span>
+            </div>
+          </div>
+
+          <div class="chart-wrap">
+            <canvas id="profileChart"></canvas>
+          </div>
+
+          <div id="statusText" class="status">Waiting for data…</div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const CONFIG = {
+      areas: {
+        area1: {
+          key: "area1",
+          label: "Area 1",
+          ortho: "assets/area1/ortho.jpg",
+          dsm: "assets/area1/dsm.png",
+          overlay: "assets/area1/section_lines.png",
+          csv: "assets/area1/area1_section_profiles.csv",
+          defaultSection: "A1-01",
+          sections: [
+            { id: "A1-01", label: "Section 1", x: 22, y: 72 },
+            { id: "A1-02", label: "Section 2", x: 50, y: 54 },
+            { id: "A1-03", label: "Section 3", x: 77, y: 38 }
+          ]
+        },
+        area2: {
+          key: "area2",
+          label: "Area 2",
+          ortho: "assets/area2/ortho.jpg",
+          dsm: "assets/area2/dsm.png",
+          overlay: "assets/area2/section_lines.png",
+          csv: "assets/area2/area2_section_profiles.csv",
+          defaultSection: "A2-01",
+          sections: [
+            { id: "A2-01", label: "Section 1", x: 22, y: 72 },
+            { id: "A2-02", label: "Section 2", x: 50, y: 54 },
+            { id: "A2-03", label: "Section 3", x: 77, y: 38 }
+          ]
+        },
+        area3: {
+          key: "area3",
+          label: "Area 3",
+          ortho: "assets/area3/ortho.jpg",
+          dsm: "assets/area3/dsm.png",
+          overlay: "assets/area3/section_lines.png",
+          csv: "assets/area3/area3_section_profiles.csv",
+          defaultSection: "A3-01",
+          sections: [
+            { id: "A3-01", label: "Section 1", x: 22, y: 72 },
+            { id: "A3-02", label: "Section 2", x: 50, y: 54 },
+            { id: "A3-03", label: "Section 3", x: 77, y: 38 }
+          ]
+        },
+        area4: {
+          key: "area4",
+          label: "Area 4",
+          ortho: "assets/area4/ortho.jpg",
+          dsm: "assets/area4/dsm.png",
+          overlay: "assets/area4/section_lines.png",
+          csv: "assets/area4/area4_section_profiles.csv",
+          defaultSection: "A4-01",
+          sections: [
+            { id: "A4-01", label: "Section 1", x: 22, y: 72 },
+            { id: "A4-02", label: "Section 2", x: 50, y: 54 },
+            { id: "A4-03", label: "Section 3", x: 77, y: 38 }
+          ]
+        },
+        area5: {
+          key: "area5",
+          label: "Area 5",
+          ortho: "assets/area5/ortho.jpg",
+          dsm: "assets/area5/dsm.png",
+          overlay: "assets/area5/section_lines.png",
+          csv: "assets/area5/area5_section_profiles.csv",
+          defaultSection: "A5-01",
+          sections: [
+            { id: "A5-01", label: "Section 1", x: 22, y: 72 },
+            { id: "A5-02", label: "Section 2", x: 50, y: 54 },
+            { id: "A5-03", label: "Section 3", x: 77, y: 38 }
+          ]
+        },
+        area6: {
+          key: "area6",
+          label: "Area 6",
+          ortho: "assets/area6/ortho.jpg",
+          dsm: "assets/area6/dsm.png",
+          overlay: "assets/area6/section_lines.png",
+          csv: "assets/area6/area6_section_profiles.csv",
+          defaultSection: "A6-01",
+          sections: [
+            { id: "A6-01", label: "Section 1", x: 22, y: 72 },
+            { id: "A6-02", label: "Section 2", x: 50, y: 54 },
+            { id: "A6-03", label: "Section 3", x: 77, y: 38 }
+          ]
+        },
+        area7: {
+          key: "area7",
+          label: "Area 7",
+          ortho: "assets/area7/ortho.jpg",
+          dsm: "assets/area7/dsm.png",
+          overlay: "assets/area7/section_lines.png",
+          csv: "assets/area7/area7_section_profiles.csv",
+          defaultSection: "A7-01",
+          sections: [
+            { id: "A7-01", label: "Section 1", x: 22, y: 72 },
+            { id: "A7-02", label: "Section 2", x: 50, y: 54 },
+            { id: "A7-03", label: "Section 3", x: 77, y: 38 }
+          ]
+        },
+        area8: {
+          key: "area8",
+          label: "Area 8",
+          ortho: "assets/area8/ortho.jpg",
+          dsm: "assets/area8/dsm.png",
+          overlay: "assets/area8/section_lines.png",
+          csv: "assets/area8/area8_section_profiles.csv",
+          defaultSection: "A8-01",
+          sections: [
+            { id: "A8-01", label: "Section 1", x: 25, y: 72 },
+            { id: "A8-02", label: "Section 2", x: 51, y: 55 },
+            { id: "A8-03", label: "Section 3", x: 76, y: 38 }
+          ]
+        }
+      },
+      defaultArea: "area8",
+      defaultBasemap: "ortho"
+    };
+
+    const state = {
+      areaKey: CONFIG.defaultArea,
+      basemap: CONFIG.defaultBasemap,
+      sectionId: null,
+      rows: [],
+      chart: null
+    };
+
+    const els = {
+      areaSelect: document.getElementById("areaSelect"),
+      orthoBtn: document.getElementById("orthoBtn"),
+      dsmBtn: document.getElementById("dsmBtn"),
+      baseImage: document.getElementById("baseImage"),
+      overlayImage: document.getElementById("overlayImage"),
+      hotspots: document.getElementById("hotspots"),
+      sectionButtons: document.getElementById("sectionButtons"),
+      chartTitle: document.getElementById("chartTitle"),
+      chartSubtitle: document.getElementById("chartSubtitle"),
+      statArea: document.getElementById("statArea"),
+      statSection: document.getElementById("statSection"),
+      statMin: document.getElementById("statMin"),
+      statMax: document.getElementById("statMax"),
+      statusText: document.getElementById("statusText"),
+      profileChart: document.getElementById("profileChart")
+    };
+
+    function currentArea() {
+      return CONFIG.areas[state.areaKey];
+    }
+
+    function splitCsvLine(line) {
+      const values = [];
+      let current = "";
+      let inQuotes = false;
+
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        const next = line[i + 1];
+
+        if (ch === '"' && inQuotes && next === '"') {
+          current += '"';
+          i++;
+        } else if (ch === '"') {
+          inQuotes = !inQuotes;
+        } else if (ch === "," && !inQuotes) {
+          values.push(current);
+          current = "";
+        } else {
+          current += ch;
+        }
+      }
+
+      values.push(current);
+      return values;
+    }
+
+    function parseCsv(text) {
+      const lines = text.trim().split(/\r?\n/).filter(Boolean);
+      if (!lines.length) return [];
+
+      const headers = splitCsvLine(lines[0]).map(h => h.trim());
+
+      return lines.slice(1).map(line => {
+        const cols = splitCsvLine(line);
+        const row = {};
+        headers.forEach((header, i) => {
+          row[header] = cols[i] !== undefined ? cols[i].trim() : "";
+        });
+        return row;
+      });
+    }
+
+    function toNumber(value) {
+      if (value === null || value === undefined) return null;
+      const s = String(value).trim();
+      if (!s || s.toLowerCase() === "null") return null;
+      const n = Number(s);
+      return Number.isFinite(n) ? n : null;
+    }
+
+    function setStatus(text, isError = false) {
+      els.statusText.textContent = text;
+      els.statusText.classList.toggle("error", isError);
+    }
+
+    function populateAreaDropdown() {
+      els.areaSelect.innerHTML = "";
+      Object.values(CONFIG.areas).forEach(area => {
+        const opt = document.createElement("option");
+        opt.value = area.key;
+        opt.textContent = area.label;
+        els.areaSelect.appendChild(opt);
+      });
+      els.areaSelect.value = state.areaKey;
+    }
+
+    function setBasemapButtonStates() {
+      els.orthoBtn.classList.toggle("active", state.basemap === "ortho");
+      els.dsmBtn.classList.toggle("active", state.basemap === "dsm");
+    }
+
+    function setDefaultSectionForArea() {
+      const area = currentArea();
+      state.sectionId = area.defaultSection || (area.sections[0] ? area.sections[0].id : null);
+    }
+
+    function renderMap() {
+      const area = currentArea();
+
+      els.baseImage.src = state.basemap === "ortho" ? area.ortho : area.dsm;
+      els.overlayImage.src = area.overlay;
+
+      els.hotspots.innerHTML = "";
+      area.sections.forEach(section => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "hotspot" + (section.id === state.sectionId ? " active" : "");
+        btn.style.left = `${section.x}%`;
+        btn.style.top = `${section.y}%`;
+        btn.textContent = section.label;
+        btn.addEventListener("click", () => {
+          state.sectionId = section.id;
+          renderAll();
+        });
+        els.hotspots.appendChild(btn);
+      });
+
+      els.sectionButtons.innerHTML = "";
+      area.sections.forEach(section => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = section.label;
+        btn.className = section.id === state.sectionId ? "active" : "";
+        btn.addEventListener("click", () => {
+          state.sectionId = section.id;
+          renderAll();
+        });
+        els.sectionButtons.appendChild(btn);
+      });
+    }
+
+    function getSectionRows() {
+      return state.rows
+        .filter(row => row.section_id === state.sectionId)
+        .map(row => ({
+          section_id: row.section_id,
+          label: row.label || row.section_id,
+          sort_order: toNumber(row.sort_order),
+          distance_m: toNumber(row.distance_m ?? row.distance),
+          height_m: toNumber(row.height_m)
+        }))
+        .filter(row => row.distance_m !== null)
+        .sort((a, b) => a.distance_m - b.distance_m);
+    }
+
+    function destroyChart() {
+      if (state.chart) {
+        state.chart.destroy();
+        state.chart = null;
+      }
+    }
+
+    function renderChart() {
+      const area = currentArea();
+      const section = area.sections.find(s => s.id === state.sectionId);
+      const sectionRows = getSectionRows();
+      const validRows = sectionRows.filter(r => r.height_m !== null);
+
+      els.chartTitle.textContent = `${area.label} – ${section ? section.label : state.sectionId}`;
+      els.chartSubtitle.textContent = "Height profile sampled along the selected fixed section line.";
+      els.statArea.textContent = area.label;
+      els.statSection.textContent = section ? section.label : state.sectionId;
+      els.statMin.textContent = validRows.length ? `${Math.min(...validRows.map(r => r.height_m)).toFixed(2)} m` : "—";
+      els.statMax.textContent = validRows.length ? `${Math.max(...validRows.map(r => r.height_m)).toFixed(2)} m` : "—";
+
+      if (!sectionRows.length) {
+        destroyChart();
+        setStatus(`No profile rows found for ${area.label} ${section ? section.label : ""}.`, true);
+        return;
+      }
+
+      const labels = sectionRows.map(r => r.distance_m);
+      const values = sectionRows.map(r => r.height_m);
+
+      if (!state.chart) {
+        state.chart = new Chart(els.profileChart, {
+          type: "line",
+          data: {
+            labels: labels,
+            datasets: [{
+              label: "Height (m)",
+              data: values,
+              borderWidth: 2,
+              pointRadius: 0,
+              tension: 0.15,
+              spanGaps: false
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+            interaction: {
+              mode: "index",
+              intersect: false
+            },
+            plugins: {
+              legend: {
+                display: true
+              },
+              tooltip: {
+                callbacks: {
+                  title(items) {
+                    return `Distance: ${items[0].label} m`;
+                  },
+                  label(ctx) {
+                    return ctx.raw === null
+                      ? "Height: no data"
+                      : `Height: ${Number(ctx.raw).toFixed(2)} m`;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                title: {
+                  display: true,
+                  text: "Distance along section (m)"
+                }
+              },
+              y: {
+                title: {
+                  display: true,
+                  text: "Height (m)"
+                }
+              }
+            }
+          }
+        });
+      } else {
+        state.chart.data.labels = labels;
+        state.chart.data.datasets[0].data = values;
+        state.chart.update();
+      }
+
+      setStatus(`Showing ${area.label}, ${section ? section.label : state.sectionId}. ${validRows.length} valid sampled points loaded.`);
+    }
+
+    function renderAll() {
+      setBasemapButtonStates();
+      renderMap();
+      renderChart();
+    }
+
+    async function loadAreaData() {
+      const area = currentArea();
+      setStatus(`Loading ${area.label} data…`);
+      els.chartSubtitle.textContent = "Loading data…";
+
+      try {
+        const response = await fetch(area.csv, { cache: "no-store" });
+        if (!response.ok) {
+          throw new Error(`Could not load ${area.csv}`);
+        }
+
+        const csvText = await response.text();
+        state.rows = parseCsv(csvText);
+
+        if (!state.rows.length) {
+          throw new Error(`CSV loaded but no rows were found in ${area.csv}`);
+        }
+
+        renderAll();
+      } catch (error) {
+        console.error(error);
+        state.rows = [];
+        destroyChart();
+        renderMap();
+        els.chartTitle.textContent = `${area.label} – Section Profile`;
+        els.chartSubtitle.textContent = "Could not load this area's profile data.";
+        els.statArea.textContent = area.label;
+        els.statSection.textContent = "—";
+        els.statMin.textContent = "—";
+        els.statMax.textContent = "—";
+        setStatus(`Could not load ${area.label}. Check that the image and CSV files exist in ${area.csv}.`, true);
+      }
+    }
+
+    function bindEvents() {
+      els.areaSelect.addEventListener("change", async (e) => {
+        state.areaKey = e.target.value;
+        setDefaultSectionForArea();
+        await loadAreaData();
+      });
+
+      els.orthoBtn.addEventListener("click", () => {
+        state.basemap = "ortho";
+        renderAll();
+      });
+
+      els.dsmBtn.addEventListener("click", () => {
+        state.basemap = "dsm";
+        renderAll();
+      });
+    }
+
+    async function init() {
+      populateAreaDropdown();
+      setDefaultSectionForArea();
+      bindEvents();
+      await loadAreaData();
+    }
+
+    init();
+  </script>
+</body>
+</html>
