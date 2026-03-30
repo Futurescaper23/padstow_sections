@@ -14,14 +14,12 @@
       --muted:#6b7280;
       --line:#d8e1eb;
       --accent:#0f766e;
-      --accent-dark:#0b5d57;
       --danger:#b91c1c;
-      --shadow:0 10px 28px rgba(0,0,0,0.08);
+      --shadow:0 10px 28px rgba(0,0,0,.08);
       --radius:18px;
     }
 
     *{box-sizing:border-box}
-
     body{
       margin:0;
       font-family:Arial, Helvetica, sans-serif;
@@ -53,7 +51,7 @@
     .title-wrap p{
       margin:0;
       color:var(--muted);
-      font-size:0.98rem;
+      font-size:.98rem;
     }
 
     .toolbar{
@@ -72,15 +70,19 @@
       display:flex;
       flex-direction:column;
       gap:6px;
-      min-width:160px;
+      min-width:170px;
     }
 
     .toolbox label{
-      font-size:0.78rem;
+      font-size:.78rem;
       text-transform:uppercase;
       letter-spacing:.03em;
       color:var(--muted);
       font-weight:700;
+    }
+
+    select, input[type="range"]{
+      width:100%;
     }
 
     select{
@@ -93,30 +95,18 @@
       cursor:pointer;
     }
 
-    .toggle-row{
+    .slider-row{
       display:flex;
-      gap:8px;
+      align-items:center;
+      gap:10px;
     }
 
-    button{
-      border:1px solid var(--line);
-      border-radius:10px;
-      padding:10px 14px;
-      background:#fff;
-      color:var(--text);
-      cursor:pointer;
+    .slider-row span{
+      min-width:42px;
+      text-align:right;
       font-weight:700;
-      transition:.2s ease;
-    }
-
-    button:hover{
-      border-color:#b8c7d8;
-    }
-
-    button.active{
-      background:var(--accent);
-      color:#fff;
-      border-color:var(--accent);
+      color:var(--muted);
+      font-size:.92rem;
     }
 
     .layout{
@@ -174,13 +164,14 @@
       pointer-events:none;
     }
 
-    .base-layer{z-index:1}
-    .overlay-layer{z-index:2}
+    .ortho-layer{z-index:1}
+    .dsm-layer{z-index:2}
+    .overlay-layer{z-index:3}
 
     .hotspots{
       position:absolute;
       inset:0;
-      z-index:3;
+      z-index:4;
       pointer-events:none;
     }
 
@@ -204,11 +195,42 @@
       background:var(--danger);
     }
 
+    .line-marker{
+      position:absolute;
+      width:14px;
+      height:14px;
+      border-radius:999px;
+      background:var(--danger);
+      border:2px solid #fff;
+      box-shadow:0 0 0 2px rgba(185,28,28,.18);
+      transform:translate(-50%,-50%);
+      z-index:5;
+      pointer-events:none;
+      display:none;
+    }
+
     .section-row{
       margin-top:12px;
       display:flex;
       flex-wrap:wrap;
       gap:8px;
+    }
+
+    button{
+      border:1px solid var(--line);
+      border-radius:10px;
+      padding:10px 14px;
+      background:#fff;
+      color:var(--text);
+      cursor:pointer;
+      font-weight:700;
+      transition:.2s ease;
+    }
+
+    button.active{
+      background:var(--accent);
+      color:#fff;
+      border-color:var(--accent);
     }
 
     .legend{
@@ -309,7 +331,7 @@
     <div class="header">
       <div class="title-wrap">
         <h1>Padstow Estuary Section Profiler</h1>
-        <p>Simple fixed-section viewer for client use. Fast loading, clear layout, and no experimental tools.</p>
+        <p>Simple fixed-section viewer with ortho / DSM blending and section-linked profile display.</p>
       </div>
 
       <div class="toolbar">
@@ -319,10 +341,10 @@
         </div>
 
         <div class="toolbox">
-          <label>Basemap</label>
-          <div class="toggle-row">
-            <button id="orthoBtn" type="button" class="active">Ortho</button>
-            <button id="dsmBtn" type="button">DSM</button>
+          <label for="opacitySlider">DSM Opacity</label>
+          <div class="slider-row">
+            <input id="opacitySlider" type="range" min="0" max="100" value="55" />
+            <span id="opacityValue">55%</span>
           </div>
         </div>
       </div>
@@ -332,21 +354,23 @@
       <section class="card">
         <div class="card-head">
           <h2>Fixed Section Map</h2>
-          <p>Choose an area, then select one of the fixed sections to view the terrain profile.</p>
+          <p>Ortho and DSM are blended together. Select a fixed section to view the height profile.</p>
         </div>
 
         <div class="map-panel">
-          <div class="map-stage">
-            <img id="baseImage" class="base-layer" alt="Basemap" />
+          <div class="map-stage" id="mapStage">
+            <img id="orthoImage" class="ortho-layer" alt="Ortho" />
+            <img id="dsmImage" class="dsm-layer" alt="DSM" />
             <img id="overlayImage" class="overlay-layer" alt="Section lines overlay" />
             <div id="hotspots" class="hotspots"></div>
+            <div id="lineMarker" class="line-marker"></div>
           </div>
 
           <div id="sectionButtons" class="section-row"></div>
 
           <div class="legend">
             <span><span class="dot a"></span>Fixed section</span>
-            <span><span class="dot b"></span>Selected section</span>
+            <span><span class="dot b"></span>Selected point on section</span>
           </div>
         </div>
       </section>
@@ -399,9 +423,9 @@
           csv: "assets/area1/area1_section_profiles.csv",
           defaultSection: "A1-01",
           sections: [
-            { id: "A1-01", label: "Section 1", x: 22, y: 72 },
-            { id: "A1-02", label: "Section 2", x: 50, y: 54 },
-            { id: "A1-03", label: "Section 3", x: 77, y: 38 }
+            { id: "A1-01", label: "Section 1", x: 22, y: 72, x2: 42, y2: 72 },
+            { id: "A1-02", label: "Section 2", x: 49, y: 55, x2: 69, y2: 55 },
+            { id: "A1-03", label: "Section 3", x: 76, y: 38, x2: 90, y2: 38 }
           ]
         },
         area2: {
@@ -413,9 +437,9 @@
           csv: "assets/area2/area2_section_profiles.csv",
           defaultSection: "A2-01",
           sections: [
-            { id: "A2-01", label: "Section 1", x: 22, y: 72 },
-            { id: "A2-02", label: "Section 2", x: 50, y: 54 },
-            { id: "A2-03", label: "Section 3", x: 77, y: 38 }
+            { id: "A2-01", label: "Section 1", x: 22, y: 72, x2: 42, y2: 72 },
+            { id: "A2-02", label: "Section 2", x: 49, y: 55, x2: 69, y2: 55 },
+            { id: "A2-03", label: "Section 3", x: 76, y: 38, x2: 90, y2: 38 }
           ]
         },
         area3: {
@@ -427,9 +451,9 @@
           csv: "assets/area3/area3_section_profiles.csv",
           defaultSection: "A3-01",
           sections: [
-            { id: "A3-01", label: "Section 1", x: 22, y: 72 },
-            { id: "A3-02", label: "Section 2", x: 50, y: 54 },
-            { id: "A3-03", label: "Section 3", x: 77, y: 38 }
+            { id: "A3-01", label: "Section 1", x: 22, y: 72, x2: 42, y2: 72 },
+            { id: "A3-02", label: "Section 2", x: 49, y: 55, x2: 69, y2: 55 },
+            { id: "A3-03", label: "Section 3", x: 76, y: 38, x2: 90, y2: 38 }
           ]
         },
         area4: {
@@ -441,9 +465,9 @@
           csv: "assets/area4/area4_section_profiles.csv",
           defaultSection: "A4-01",
           sections: [
-            { id: "A4-01", label: "Section 1", x: 22, y: 72 },
-            { id: "A4-02", label: "Section 2", x: 50, y: 54 },
-            { id: "A4-03", label: "Section 3", x: 77, y: 38 }
+            { id: "A4-01", label: "Section 1", x: 22, y: 72, x2: 42, y2: 72 },
+            { id: "A4-02", label: "Section 2", x: 49, y: 55, x2: 69, y2: 55 },
+            { id: "A4-03", label: "Section 3", x: 76, y: 38, x2: 90, y2: 38 }
           ]
         },
         area5: {
@@ -455,9 +479,9 @@
           csv: "assets/area5/area5_section_profiles.csv",
           defaultSection: "A5-01",
           sections: [
-            { id: "A5-01", label: "Section 1", x: 22, y: 72 },
-            { id: "A5-02", label: "Section 2", x: 50, y: 54 },
-            { id: "A5-03", label: "Section 3", x: 77, y: 38 }
+            { id: "A5-01", label: "Section 1", x: 22, y: 72, x2: 42, y2: 72 },
+            { id: "A5-02", label: "Section 2", x: 49, y: 55, x2: 69, y2: 55 },
+            { id: "A5-03", label: "Section 3", x: 76, y: 38, x2: 90, y2: 38 }
           ]
         },
         area6: {
@@ -469,9 +493,9 @@
           csv: "assets/area6/area6_section_profiles.csv",
           defaultSection: "A6-01",
           sections: [
-            { id: "A6-01", label: "Section 1", x: 22, y: 72 },
-            { id: "A6-02", label: "Section 2", x: 50, y: 54 },
-            { id: "A6-03", label: "Section 3", x: 77, y: 38 }
+            { id: "A6-01", label: "Section 1", x: 22, y: 72, x2: 42, y2: 72 },
+            { id: "A6-02", label: "Section 2", x: 49, y: 55, x2: 69, y2: 55 },
+            { id: "A6-03", label: "Section 3", x: 76, y: 38, x2: 90, y2: 38 }
           ]
         },
         area7: {
@@ -483,9 +507,9 @@
           csv: "assets/area7/area7_section_profiles.csv",
           defaultSection: "A7-01",
           sections: [
-            { id: "A7-01", label: "Section 1", x: 22, y: 72 },
-            { id: "A7-02", label: "Section 2", x: 50, y: 54 },
-            { id: "A7-03", label: "Section 3", x: 77, y: 38 }
+            { id: "A7-01", label: "Section 1", x: 22, y: 72, x2: 42, y2: 72 },
+            { id: "A7-02", label: "Section 2", x: 49, y: 55, x2: 69, y2: 55 },
+            { id: "A7-03", label: "Section 3", x: 76, y: 38, x2: 90, y2: 38 }
           ]
         },
         area8: {
@@ -497,32 +521,34 @@
           csv: "assets/area8/area8_section_profiles.csv",
           defaultSection: "A8-01",
           sections: [
-            { id: "A8-01", label: "Section 1", x: 25, y: 72 },
-            { id: "A8-02", label: "Section 2", x: 51, y: 55 },
-            { id: "A8-03", label: "Section 3", x: 76, y: 38 }
+            { id: "A8-01", label: "Section 1", x: 25, y: 72, x2: 43, y2: 72 },
+            { id: "A8-02", label: "Section 2", x: 51, y: 55, x2: 67, y2: 55 },
+            { id: "A8-03", label: "Section 3", x: 76, y: 38, x2: 90, y2: 38 }
           ]
         }
       },
       defaultArea: "area8",
-      defaultBasemap: "ortho"
+      defaultOpacity: 55
     };
 
     const state = {
       areaKey: CONFIG.defaultArea,
-      basemap: CONFIG.defaultBasemap,
       sectionId: null,
       rows: [],
-      chart: null
+      chart: null,
+      hoverIndex: null
     };
 
     const els = {
       areaSelect: document.getElementById("areaSelect"),
-      orthoBtn: document.getElementById("orthoBtn"),
-      dsmBtn: document.getElementById("dsmBtn"),
-      baseImage: document.getElementById("baseImage"),
+      opacitySlider: document.getElementById("opacitySlider"),
+      opacityValue: document.getElementById("opacityValue"),
+      orthoImage: document.getElementById("orthoImage"),
+      dsmImage: document.getElementById("dsmImage"),
       overlayImage: document.getElementById("overlayImage"),
       hotspots: document.getElementById("hotspots"),
       sectionButtons: document.getElementById("sectionButtons"),
+      lineMarker: document.getElementById("lineMarker"),
       chartTitle: document.getElementById("chartTitle"),
       chartSubtitle: document.getElementById("chartSubtitle"),
       statArea: document.getElementById("statArea"),
@@ -537,15 +563,17 @@
       return CONFIG.areas[state.areaKey];
     }
 
+    function currentSectionMeta() {
+      return currentArea().sections.find(s => s.id === state.sectionId) || null;
+    }
+
     function splitCsvLine(line) {
       const values = [];
       let current = "";
       let inQuotes = false;
-
       for (let i = 0; i < line.length; i++) {
         const ch = line[i];
         const next = line[i + 1];
-
         if (ch === '"' && inQuotes && next === '"') {
           current += '"';
           i++;
@@ -558,7 +586,6 @@
           current += ch;
         }
       }
-
       values.push(current);
       return values;
     }
@@ -566,9 +593,7 @@
     function parseCsv(text) {
       const lines = text.trim().split(/\r?\n/).filter(Boolean);
       if (!lines.length) return [];
-
       const headers = splitCsvLine(lines[0]).map(h => h.trim());
-
       return lines.slice(1).map(line => {
         const cols = splitCsvLine(line);
         const row = {};
@@ -603,20 +628,22 @@
       els.areaSelect.value = state.areaKey;
     }
 
-    function setBasemapButtonStates() {
-      els.orthoBtn.classList.toggle("active", state.basemap === "ortho");
-      els.dsmBtn.classList.toggle("active", state.basemap === "dsm");
-    }
-
     function setDefaultSectionForArea() {
       const area = currentArea();
       state.sectionId = area.defaultSection || (area.sections[0] ? area.sections[0].id : null);
+      state.hoverIndex = null;
+    }
+
+    function updateOpacity() {
+      const opacity = Number(els.opacitySlider.value) / 100;
+      els.dsmImage.style.opacity = opacity;
+      els.opacityValue.textContent = `${els.opacitySlider.value}%`;
     }
 
     function renderMap() {
       const area = currentArea();
-
-      els.baseImage.src = state.basemap === "ortho" ? area.ortho : area.dsm;
+      els.orthoImage.src = area.ortho;
+      els.dsmImage.src = area.dsm;
       els.overlayImage.src = area.overlay;
 
       els.hotspots.innerHTML = "";
@@ -629,6 +656,7 @@
         btn.textContent = section.label;
         btn.addEventListener("click", () => {
           state.sectionId = section.id;
+          state.hoverIndex = null;
           renderAll();
         });
         els.hotspots.appendChild(btn);
@@ -642,10 +670,13 @@
         btn.className = section.id === state.sectionId ? "active" : "";
         btn.addEventListener("click", () => {
           state.sectionId = section.id;
+          state.hoverIndex = null;
           renderAll();
         });
         els.sectionButtons.appendChild(btn);
       });
+
+      updateMarker();
     }
 
     function getSectionRows() {
@@ -662,6 +693,29 @@
         .sort((a, b) => a.distance_m - b.distance_m);
     }
 
+    function updateMarker() {
+      const section = currentSectionMeta();
+      const rows = getSectionRows();
+      const marker = els.lineMarker;
+
+      if (!section || !rows.length) {
+        marker.style.display = "none";
+        return;
+      }
+
+      const idx = state.hoverIndex !== null
+        ? Math.max(0, Math.min(state.hoverIndex, rows.length - 1))
+        : Math.floor(rows.length / 2);
+
+      const progress = rows.length > 1 ? idx / (rows.length - 1) : 0;
+      const x = section.x + (section.x2 - section.x) * progress;
+      const y = section.y + (section.y2 - section.y) * progress;
+
+      marker.style.left = `${x}%`;
+      marker.style.top = `${y}%`;
+      marker.style.display = "block";
+    }
+
     function destroyChart() {
       if (state.chart) {
         state.chart.destroy();
@@ -671,25 +725,26 @@
 
     function renderChart() {
       const area = currentArea();
-      const section = area.sections.find(s => s.id === state.sectionId);
-      const sectionRows = getSectionRows();
-      const validRows = sectionRows.filter(r => r.height_m !== null);
+      const section = currentSectionMeta();
+      const rows = getSectionRows();
+      const validRows = rows.filter(r => r.height_m !== null);
 
-      els.chartTitle.textContent = `${area.label} – ${section ? section.label : state.sectionId}`;
+      els.chartTitle.textContent = `${area.label} – ${section ? section.label : "Section Profile"}`;
       els.chartSubtitle.textContent = "Height profile sampled along the selected fixed section line.";
       els.statArea.textContent = area.label;
-      els.statSection.textContent = section ? section.label : state.sectionId;
+      els.statSection.textContent = section ? section.label : "—";
       els.statMin.textContent = validRows.length ? `${Math.min(...validRows.map(r => r.height_m)).toFixed(2)} m` : "—";
       els.statMax.textContent = validRows.length ? `${Math.max(...validRows.map(r => r.height_m)).toFixed(2)} m` : "—";
 
-      if (!sectionRows.length) {
+      if (!rows.length) {
         destroyChart();
+        updateMarker();
         setStatus(`No profile rows found for ${area.label} ${section ? section.label : ""}.`, true);
         return;
       }
 
-      const labels = sectionRows.map(r => r.distance_m);
-      const values = sectionRows.map(r => r.height_m);
+      const labels = rows.map(r => r.distance_m);
+      const values = rows.map(r => r.height_m);
 
       if (!state.chart) {
         state.chart = new Chart(els.profileChart, {
@@ -701,6 +756,7 @@
               data: values,
               borderWidth: 2,
               pointRadius: 0,
+              pointHoverRadius: 5,
               tension: 0.15,
               spanGaps: false
             }]
@@ -712,6 +768,14 @@
             interaction: {
               mode: "index",
               intersect: false
+            },
+            onHover: (event, activeElements) => {
+              if (activeElements && activeElements.length) {
+                state.hoverIndex = activeElements[0].index;
+              } else {
+                state.hoverIndex = null;
+              }
+              updateMarker();
             },
             plugins: {
               legend: {
@@ -752,11 +816,11 @@
         state.chart.update();
       }
 
+      updateMarker();
       setStatus(`Showing ${area.label}, ${section ? section.label : state.sectionId}. ${validRows.length} valid sampled points loaded.`);
     }
 
     function renderAll() {
-      setBasemapButtonStates();
       renderMap();
       renderChart();
     }
@@ -791,8 +855,16 @@
         els.statSection.textContent = "—";
         els.statMin.textContent = "—";
         els.statMax.textContent = "—";
-        setStatus(`Could not load ${area.label}. Check that the image and CSV files exist in ${area.csv}.`, true);
+        setStatus(`Could not load ${area.label}. Check the CSV path and the deployed file names.`, true);
       }
+    }
+
+    function bindImageDebug() {
+      [els.orthoImage, els.dsmImage, els.overlayImage].forEach(img => {
+        img.addEventListener("error", () => {
+          console.error("Image failed to load:", img.src);
+        });
+      });
     }
 
     function bindEvents() {
@@ -802,21 +874,21 @@
         await loadAreaData();
       });
 
-      els.orthoBtn.addEventListener("click", () => {
-        state.basemap = "ortho";
-        renderAll();
-      });
+      els.opacitySlider.addEventListener("input", updateOpacity);
 
-      els.dsmBtn.addEventListener("click", () => {
-        state.basemap = "dsm";
-        renderAll();
+      els.profileChart.addEventListener("mouseleave", () => {
+        state.hoverIndex = null;
+        updateMarker();
       });
     }
 
     async function init() {
       populateAreaDropdown();
-      setDefaultSectionForArea();
+      els.opacitySlider.value = CONFIG.defaultOpacity;
       bindEvents();
+      bindImageDebug();
+      setDefaultSectionForArea();
+      updateOpacity();
       await loadAreaData();
     }
 
