@@ -21,9 +21,7 @@
       --radius: 18px;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -86,8 +84,7 @@
       font-weight: 700;
     }
 
-    select,
-    input[type="range"] {
+    select, input[type="range"] {
       width: 100%;
     }
 
@@ -198,17 +195,9 @@
       pointer-events: none;
     }
 
-    .ortho-layer {
-      z-index: 1;
-    }
-
-    .dsm-layer {
-      z-index: 2;
-    }
-
-    .overlay-layer {
-      z-index: 3;
-    }
+    .ortho-layer { z-index: 1; }
+    .dsm-layer { z-index: 2; }
+    .overlay-layer { z-index: 3; }
 
     .line-marker {
       position: absolute;
@@ -249,13 +238,8 @@
       vertical-align: middle;
     }
 
-    .dot.a {
-      background: var(--accent);
-    }
-
-    .dot.b {
-      background: var(--danger);
-    }
+    .dot.a { background: var(--accent); }
+    .dot.b { background: var(--danger); }
 
     .chart-panel {
       padding: 14px;
@@ -327,29 +311,17 @@
     }
 
     @media (max-width: 1080px) {
-      .layout {
-        grid-template-columns: 1fr;
-      }
-
-      .chart-wrap {
-        height: 360px;
-      }
+      .layout { grid-template-columns: 1fr; }
+      .chart-wrap { height: 360px; }
     }
 
     @media (max-width: 720px) {
-      .app {
-        padding: 12px;
-      }
-
-      .stats {
-        grid-template-columns: 1fr 1fr;
-      }
+      .app { padding: 12px; }
+      .stats { grid-template-columns: 1fr 1fr; }
     }
 
     @media (max-width: 520px) {
-      .stats {
-        grid-template-columns: 1fr;
-      }
+      .stats { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -358,7 +330,7 @@
     <div class="header">
       <div class="title-wrap">
         <h1>Padstow Estuary Section Profiler</h1>
-        <p>Fixed section viewer with an aerial photo, a height map, and simple section profiles.</p>
+        <p>Simple section viewer using an aerial photo, a height map, and section profiles.</p>
       </div>
 
       <div class="toolbar">
@@ -389,8 +361,8 @@
 
         <div class="map-panel">
           <div class="map-stage">
-            <img id="orthoImage" class="ortho-layer" alt="Ortho" />
-            <img id="dsmImage" class="dsm-layer" alt="DSM" />
+            <img id="orthoImage" class="ortho-layer" alt="Aerial photo" />
+            <img id="dsmImage" class="dsm-layer" alt="Height map" />
             <img id="overlayImage" class="overlay-layer" alt="Section lines overlay" />
             <div id="lineMarker" class="line-marker"></div>
           </div>
@@ -401,9 +373,10 @@
             <span><span class="dot a"></span>Fixed section</span>
             <span><span class="dot b"></span>Selected point on section</span>
           </div>
+
           <div class="status" style="margin-top:10px;">
-  <strong>About water areas:</strong> Drone mapping does not capture open water accurately, so water sections have been capped at <strong>-2 metres</strong> in the profile to avoid misleading spikes and dips.
-</div>
+            <strong>About water areas:</strong> Drone mapping does not capture open water accurately, so water sections have been capped at <strong>-2 metres</strong> in the profile to avoid misleading spikes and dips.
+          </div>
         </div>
       </section>
 
@@ -448,42 +421,6 @@
   <script>
     const WATER_FLOOR = -2;
 
-    const defaultSectionPaths = [
-      {
-        id: "S-01",
-        label: "Section 1",
-        path: [
-          { x: 18, y: 72 },
-          { x: 24, y: 71 },
-          { x: 30, y: 70 },
-          { x: 36, y: 69 },
-          { x: 42, y: 68 }
-        ]
-      },
-      {
-        id: "S-02",
-        label: "Section 2",
-        path: [
-          { x: 44, y: 55 },
-          { x: 50, y: 54 },
-          { x: 56, y: 53 },
-          { x: 62, y: 52 },
-          { x: 68, y: 51 }
-        ]
-      },
-      {
-        id: "S-03",
-        label: "Section 3",
-        path: [
-          { x: 71, y: 38 },
-          { x: 76, y: 37 },
-          { x: 81, y: 36 },
-          { x: 86, y: 35 },
-          { x: 91, y: 34 }
-        ]
-      }
-    ];
-
     const CONFIG = {
       areas: {
         area1: {
@@ -494,11 +431,12 @@
           csv: "assets/area1/area1_section_profiles.csv",
           defaultSection: "A1-01",
           sections: [
-            { id: "A1-01", label: "Section 1", path: defaultSectionPaths[0].path },
-            { id: "A1-02", label: "Section 2", path: defaultSectionPaths[1].path },
-            { id: "A1-03", label: "Section 3", path: defaultSectionPaths[2].path }
+            { id: "A1-01", label: "Section 1", path: [{ x: 18, y: 72 }, { x: 24, y: 71 }] },
+            { id: "A1-02", label: "Section 2", path: [{ x: 44, y: 55 }, { x: 50, y: 54 }] },
+            { id: "A1-03", label: "Section 3", path: [{ x: 71, y: 38 }, { x: 76, y: 37 }] }
           ]
         },
+
         area2: {
           label: "Area 2",
           ortho: "assets/area2/ortho.jpg",
@@ -507,11 +445,12 @@
           csv: "assets/area2/area2_section_profiles.csv",
           defaultSection: "A2-01",
           sections: [
-            { id: "A2-01", label: "Section 1", path: defaultSectionPaths[0].path },
-            { id: "A2-02", label: "Section 2", path: defaultSectionPaths[1].path },
-            { id: "A2-03", label: "Section 3", path: defaultSectionPaths[2].path }
+            { id: "A2-01", label: "Section 1", path: [{ x: 18, y: 72 }, { x: 24, y: 71 }] },
+            { id: "A2-02", label: "Section 2", path: [{ x: 44, y: 55 }, { x: 50, y: 54 }] },
+            { id: "A2-03", label: "Section 3", path: [{ x: 71, y: 38 }, { x: 76, y: 37 }] }
           ]
         },
+
         area3: {
           label: "Area 3",
           ortho: "assets/area3/ortho.jpg",
@@ -520,11 +459,12 @@
           csv: "assets/area3/area3_section_profiles.csv",
           defaultSection: "A3-01",
           sections: [
-            { id: "A3-01", label: "Section 1", path: defaultSectionPaths[0].path },
-            { id: "A3-02", label: "Section 2", path: defaultSectionPaths[1].path },
-            { id: "A3-03", label: "Section 3", path: defaultSectionPaths[2].path }
+            { id: "A3-01", label: "Section 1", path: [{ x: 18, y: 72 }, { x: 24, y: 71 }] },
+            { id: "A3-02", label: "Section 2", path: [{ x: 44, y: 55 }, { x: 50, y: 54 }] },
+            { id: "A3-03", label: "Section 3", path: [{ x: 71, y: 38 }, { x: 76, y: 37 }] }
           ]
         },
+
         area4: {
           label: "Area 4",
           ortho: "assets/area4/ortho.jpg",
@@ -533,11 +473,12 @@
           csv: "assets/area4/area4_section_profiles.csv",
           defaultSection: "A4-01",
           sections: [
-            { id: "A4-01", label: "Section 1", path: defaultSectionPaths[0].path },
-            { id: "A4-02", label: "Section 2", path: defaultSectionPaths[1].path },
-            { id: "A4-03", label: "Section 3", path: defaultSectionPaths[2].path }
+            { id: "A4-01", label: "Section 1", path: [{ x: 18, y: 72 }, { x: 24, y: 71 }] },
+            { id: "A4-02", label: "Section 2", path: [{ x: 44, y: 55 }, { x: 50, y: 54 }] },
+            { id: "A4-03", label: "Section 3", path: [{ x: 71, y: 38 }, { x: 76, y: 37 }] }
           ]
         },
+
         area5: {
           label: "Area 5",
           ortho: "assets/area5/ortho.jpg",
@@ -546,11 +487,12 @@
           csv: "assets/area5/area5_section_profiles.csv",
           defaultSection: "A5-01",
           sections: [
-            { id: "A5-01", label: "Section 1", path: defaultSectionPaths[0].path },
-            { id: "A5-02", label: "Section 2", path: defaultSectionPaths[1].path },
-            { id: "A5-03", label: "Section 3", path: defaultSectionPaths[2].path }
+            { id: "A5-01", label: "Section 1", path: [{ x: 18, y: 72 }, { x: 24, y: 71 }] },
+            { id: "A5-02", label: "Section 2", path: [{ x: 44, y: 55 }, { x: 50, y: 54 }] },
+            { id: "A5-03", label: "Section 3", path: [{ x: 71, y: 38 }, { x: 76, y: 37 }] }
           ]
         },
+
         area6: {
           label: "Area 6",
           ortho: "assets/area6/ortho.jpg",
@@ -559,11 +501,12 @@
           csv: "assets/area6/area6_section_profiles.csv",
           defaultSection: "A6-01",
           sections: [
-            { id: "A6-01", label: "Section 1", path: defaultSectionPaths[0].path },
-            { id: "A6-02", label: "Section 2", path: defaultSectionPaths[1].path },
-            { id: "A6-03", label: "Section 3", path: defaultSectionPaths[2].path }
+            { id: "A6-01", label: "Section 1", path: [{ x: 18, y: 72 }, { x: 24, y: 71 }] },
+            { id: "A6-02", label: "Section 2", path: [{ x: 44, y: 55 }, { x: 50, y: 54 }] },
+            { id: "A6-03", label: "Section 3", path: [{ x: 71, y: 38 }, { x: 76, y: 37 }] }
           ]
         },
+
         area7: {
           label: "Area 7",
           ortho: "assets/area7/ortho.jpg",
@@ -572,11 +515,12 @@
           csv: "assets/area7/area7_section_profiles.csv",
           defaultSection: "A7-01",
           sections: [
-            { id: "A7-01", label: "Section 1", path: defaultSectionPaths[0].path },
-            { id: "A7-02", label: "Section 2", path: defaultSectionPaths[1].path },
-            { id: "A7-03", label: "Section 3", path: defaultSectionPaths[2].path }
+            { id: "A7-01", label: "Section 1", path: [{ x: 18, y: 72 }, { x: 24, y: 71 }] },
+            { id: "A7-02", label: "Section 2", path: [{ x: 44, y: 55 }, { x: 50, y: 54 }] },
+            { id: "A7-03", label: "Section 3", path: [{ x: 71, y: 38 }, { x: 76, y: 37 }] }
           ]
         },
+
         area8: {
           label: "Area 8",
           ortho: "assets/area8/ortho.jpg",
@@ -585,32 +529,12 @@
           csv: "assets/area8/area8_section_profiles.csv",
           defaultSection: "A8-01",
           sections: [
-            {
-              id: "A8-01",
-              label: "Section 1",
-              path: [
-                { x: 19, y: 21 },
-                { x: 18, y: 73 }
-              ]
-            },
-            {
-              id: "A8-02",
-              label: "Section 2",
-              path: [
-                { x: 49, y: 7 },
-                { x: 54, y: 76 }
-              ]
-            },
-            {
-              id: "A8-03",
-              label: "Section 3",
-              path: [
-                { x: 88, y: 33 },
-                { x: 72, y: 92 }
-              ]
-            }
+            { id: "A8-01", label: "Section 1", path: [{ x: 16, y: 22 }, { x: 14, y: 71 }] },
+            { id: "A8-02", label: "Section 2", path: [{ x: 49, y: 7 }, { x: 54, y: 76 }] },
+            { id: "A8-03", label: "Section 3", path: [{ x: 93, y: 34 }, { x: 76, y: 89 }] }
           ]
         },
+
         estuary: {
           label: "Whole Estuary",
           ortho: "assets/estuary/ortho.jpg",
@@ -619,12 +543,13 @@
           csv: "assets/estuary/estuary_section_profiles.csv",
           defaultSection: "EST-01",
           sections: [
-            { id: "EST-01", label: "Estuary Section 1", path: defaultSectionPaths[0].path },
-            { id: "EST-02", label: "Estuary Section 2", path: defaultSectionPaths[1].path },
-            { id: "EST-03", label: "Estuary Section 3", path: defaultSectionPaths[2].path }
+            { id: "EST-01", label: "Estuary Section 1", path: [{ x: 18, y: 72 }, { x: 24, y: 71 }] },
+            { id: "EST-02", label: "Estuary Section 2", path: [{ x: 44, y: 55 }, { x: 50, y: 54 }] },
+            { id: "EST-03", label: "Estuary Section 3", path: [{ x: 71, y: 38 }, { x: 76, y: 37 }] }
           ]
         }
       },
+
       defaultArea: "area8",
       defaultOpacity: 55
     };
@@ -839,8 +764,8 @@
       const validRows = rows.filter(r => r.height_m !== null);
 
       els.mapTitle.textContent = `${area.label} Fixed Section Map`;
-      els.chartTitle.textContent = `${area.label} – ${section ? section.label : "Section Profile"}`;
-      els.chartSubtitle.textContent = "Height profile sampled along the selected fixed section line.";
+      els.chartTitle.textContent = `${area.label} - ${section ? section.label : "Ground Profile"}`;
+      els.chartSubtitle.textContent = "Ground profile sampled along the selected fixed section line.";
       els.statArea.textContent = area.label;
       els.statSection.textContent = section ? section.label : "—";
       els.statMin.textContent = validRows.length ? `${Math.min(...validRows.map(r => r.height_m)).toFixed(2)} m` : "—";
@@ -976,7 +901,7 @@
         destroyChart();
         renderSectionButtons();
         els.mapTitle.textContent = `${area.label} Fixed Section Map`;
-        els.chartTitle.textContent = `${area.label} – Section Profile`;
+        els.chartTitle.textContent = `${area.label} - Ground Profile`;
         els.chartSubtitle.textContent = "Could not load this area's profile data.";
         els.statArea.textContent = area.label;
         els.statSection.textContent = "—";
