@@ -358,7 +358,7 @@
     <div class="header">
       <div class="title-wrap">
         <h1>Padstow Estuary Section Profiler</h1>
-        <p>Fixed section viewer with ortho / DSM blending, cleaned water spikes, and section-linked profile display.</p>
+        <p>Fixed section viewer with an aerial photo, a height map, and simple section profiles.</p>
       </div>
 
       <div class="toolbar">
@@ -368,7 +368,7 @@
         </div>
 
         <div class="toolbox">
-          <label for="opacitySlider">DSM Opacity</label>
+          <label for="opacitySlider">Height map opacity</label>
           <div class="slider-row">
             <input id="opacitySlider" type="range" min="0" max="100" value="55" />
             <span id="opacityValue">55%</span>
@@ -382,7 +382,7 @@
         <div class="card-head">
           <div>
             <h2 id="mapTitle">Fixed Section Map</h2>
-            <p>Blend ortho and DSM, then select a fixed section to view the height profile.</p>
+            <p>Blend the aerial photo and height map, then select a section to view the ground profile.</p>
           </div>
           <button id="expandMapBtn" type="button">Expand Map</button>
         </div>
@@ -401,13 +401,16 @@
             <span><span class="dot a"></span>Fixed section</span>
             <span><span class="dot b"></span>Selected point on section</span>
           </div>
+          <div class="status" style="margin-top:10px;">
+  <strong>About water areas:</strong> Drone mapping does not capture open water accurately, so water sections have been capped at <strong>-2 metres</strong> in the profile to avoid misleading spikes and dips.
+</div>
         </div>
       </section>
 
       <section class="card chart-card">
         <div class="card-head">
           <div>
-            <h2 id="chartTitle">Section Profile</h2>
+            <h2 id="chartTitle">Ground Profile</h2>
             <p id="chartSubtitle">Loading data…</p>
           </div>
         </div>
