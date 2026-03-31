@@ -75,7 +75,7 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
-      min-width: 200px;
+      min-width: 190px;
     }
 
     .toolbox label {
@@ -86,8 +86,19 @@
       font-weight: 700;
     }
 
+    select,
     input[type="range"] {
       width: 100%;
+    }
+
+    select {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 1rem;
+      background: var(--panel-2);
+      color: var(--text);
+      cursor: pointer;
     }
 
     .slider-row {
@@ -347,10 +358,15 @@
     <div class="header">
       <div class="title-wrap">
         <h1>Padstow Estuary Section Profiler</h1>
-        <p>Fixed section viewer with ortho / DSM blending, darker styling, and section-linked profile display.</p>
+        <p>Fixed section viewer with ortho / DSM blending, cleaned water spikes, and section-linked profile display.</p>
       </div>
 
       <div class="toolbar">
+        <div class="toolbox">
+          <label for="areaSelect">Area</label>
+          <select id="areaSelect"></select>
+        </div>
+
         <div class="toolbox">
           <label for="opacitySlider">DSM Opacity</label>
           <div class="slider-row">
@@ -365,7 +381,7 @@
       <section class="card map-card">
         <div class="card-head">
           <div>
-            <h2>Area 8 Fixed Section Map</h2>
+            <h2 id="mapTitle">Fixed Section Map</h2>
             <p>Blend ortho and DSM, then select a fixed section to view the height profile.</p>
           </div>
           <button id="expandMapBtn" type="button">Expand Map</button>
@@ -427,47 +443,192 @@
   </div>
 
   <script>
-    const CONFIG = {
-      area: {
-        key: "area8",
-        label: "Area 8",
-        ortho: "assets/area8/ortho.jpg",
-        dsm: "assets/area8/dsm.png",
-        overlay: "assets/area8/section_lines.png",
-        csv: "assets/area8/area8_section_profiles.csv",
-        defaultSection: "A8-01",
-        sections: [
-          {
-            id: "A8-01",
-            label: "Section 1",
-            path: [
-              { x: 20, y: 22 },
-              { x: 18, y: 71 }
-            ]
-          },
-          {
-            id: "A8-02",
-            label: "Section 2",
-            path: [
-              { x: 49, y: 7 },
-              { x: 54, y: 76 }
-            ]
-          },
-          {
-            id: "A8-03",
-            label: "Section 3",
-            path: [
-              { x: 88, y: 34 },
-              { x: 72, y: 89 }
-            ]
-          }
+    const WATER_FLOOR = -4;
+
+    const defaultSectionPaths = [
+      {
+        id: "S-01",
+        label: "Section 1",
+        path: [
+          { x: 18, y: 72 },
+          { x: 24, y: 71 },
+          { x: 30, y: 70 },
+          { x: 36, y: 69 },
+          { x: 42, y: 68 }
         ]
       },
+      {
+        id: "S-02",
+        label: "Section 2",
+        path: [
+          { x: 44, y: 55 },
+          { x: 50, y: 54 },
+          { x: 56, y: 53 },
+          { x: 62, y: 52 },
+          { x: 68, y: 51 }
+        ]
+      },
+      {
+        id: "S-03",
+        label: "Section 3",
+        path: [
+          { x: 71, y: 38 },
+          { x: 76, y: 37 },
+          { x: 81, y: 36 },
+          { x: 86, y: 35 },
+          { x: 91, y: 34 }
+        ]
+      }
+    ];
+
+    const CONFIG = {
+      areas: {
+        area1: {
+          label: "Area 1",
+          ortho: "assets/area1/ortho.jpg",
+          dsm: "assets/area1/dsm.png",
+          overlay: "assets/area1/section_lines.png",
+          csv: "assets/area1/area1_section_profiles.csv",
+          defaultSection: "A1-01",
+          sections: [
+            { id: "A1-01", label: "Section 1", path: defaultSectionPaths[0].path },
+            { id: "A1-02", label: "Section 2", path: defaultSectionPaths[1].path },
+            { id: "A1-03", label: "Section 3", path: defaultSectionPaths[2].path }
+          ]
+        },
+        area2: {
+          label: "Area 2",
+          ortho: "assets/area2/ortho.jpg",
+          dsm: "assets/area2/dsm.png",
+          overlay: "assets/area2/section_lines.png",
+          csv: "assets/area2/area2_section_profiles.csv",
+          defaultSection: "A2-01",
+          sections: [
+            { id: "A2-01", label: "Section 1", path: defaultSectionPaths[0].path },
+            { id: "A2-02", label: "Section 2", path: defaultSectionPaths[1].path },
+            { id: "A2-03", label: "Section 3", path: defaultSectionPaths[2].path }
+          ]
+        },
+        area3: {
+          label: "Area 3",
+          ortho: "assets/area3/ortho.jpg",
+          dsm: "assets/area3/dsm.png",
+          overlay: "assets/area3/section_lines.png",
+          csv: "assets/area3/area3_section_profiles.csv",
+          defaultSection: "A3-01",
+          sections: [
+            { id: "A3-01", label: "Section 1", path: defaultSectionPaths[0].path },
+            { id: "A3-02", label: "Section 2", path: defaultSectionPaths[1].path },
+            { id: "A3-03", label: "Section 3", path: defaultSectionPaths[2].path }
+          ]
+        },
+        area4: {
+          label: "Area 4",
+          ortho: "assets/area4/ortho.jpg",
+          dsm: "assets/area4/dsm.png",
+          overlay: "assets/area4/section_lines.png",
+          csv: "assets/area4/area4_section_profiles.csv",
+          defaultSection: "A4-01",
+          sections: [
+            { id: "A4-01", label: "Section 1", path: defaultSectionPaths[0].path },
+            { id: "A4-02", label: "Section 2", path: defaultSectionPaths[1].path },
+            { id: "A4-03", label: "Section 3", path: defaultSectionPaths[2].path }
+          ]
+        },
+        area5: {
+          label: "Area 5",
+          ortho: "assets/area5/ortho.jpg",
+          dsm: "assets/area5/dsm.png",
+          overlay: "assets/area5/section_lines.png",
+          csv: "assets/area5/area5_section_profiles.csv",
+          defaultSection: "A5-01",
+          sections: [
+            { id: "A5-01", label: "Section 1", path: defaultSectionPaths[0].path },
+            { id: "A5-02", label: "Section 2", path: defaultSectionPaths[1].path },
+            { id: "A5-03", label: "Section 3", path: defaultSectionPaths[2].path }
+          ]
+        },
+        area6: {
+          label: "Area 6",
+          ortho: "assets/area6/ortho.jpg",
+          dsm: "assets/area6/dsm.png",
+          overlay: "assets/area6/section_lines.png",
+          csv: "assets/area6/area6_section_profiles.csv",
+          defaultSection: "A6-01",
+          sections: [
+            { id: "A6-01", label: "Section 1", path: defaultSectionPaths[0].path },
+            { id: "A6-02", label: "Section 2", path: defaultSectionPaths[1].path },
+            { id: "A6-03", label: "Section 3", path: defaultSectionPaths[2].path }
+          ]
+        },
+        area7: {
+          label: "Area 7",
+          ortho: "assets/area7/ortho.jpg",
+          dsm: "assets/area7/dsm.png",
+          overlay: "assets/area7/section_lines.png",
+          csv: "assets/area7/area7_section_profiles.csv",
+          defaultSection: "A7-01",
+          sections: [
+            { id: "A7-01", label: "Section 1", path: defaultSectionPaths[0].path },
+            { id: "A7-02", label: "Section 2", path: defaultSectionPaths[1].path },
+            { id: "A7-03", label: "Section 3", path: defaultSectionPaths[2].path }
+          ]
+        },
+        area8: {
+          label: "Area 8",
+          ortho: "assets/area8/ortho.jpg",
+          dsm: "assets/area8/dsm.png",
+          overlay: "assets/area8/section_lines.png",
+          csv: "assets/area8/area8_section_profiles.csv",
+          defaultSection: "A8-01",
+          sections: [
+            {
+              id: "A8-01",
+              label: "Section 1",
+              path: [
+                { x: 16, y: 22 },
+                { x: 14, y: 71 }
+              ]
+            },
+            {
+              id: "A8-02",
+              label: "Section 2",
+              path: [
+                { x: 49, y: 7 },
+                { x: 54, y: 76 }
+              ]
+            },
+            {
+              id: "A8-03",
+              label: "Section 3",
+              path: [
+                { x: 93, y: 34 },
+                { x: 76, y: 89 }
+              ]
+            }
+          ]
+        },
+        estuary: {
+          label: "Whole Estuary",
+          ortho: "assets/estuary/ortho.jpg",
+          dsm: "assets/estuary/dsm.png",
+          overlay: "assets/estuary/section_lines.png",
+          csv: "assets/estuary/estuary_section_profiles.csv",
+          defaultSection: "EST-01",
+          sections: [
+            { id: "EST-01", label: "Estuary Section 1", path: defaultSectionPaths[0].path },
+            { id: "EST-02", label: "Estuary Section 2", path: defaultSectionPaths[1].path },
+            { id: "EST-03", label: "Estuary Section 3", path: defaultSectionPaths[2].path }
+          ]
+        }
+      },
+      defaultArea: "area8",
       defaultOpacity: 55
     };
 
     const state = {
-      sectionId: CONFIG.area.defaultSection,
+      areaKey: CONFIG.defaultArea,
+      sectionId: null,
       rows: [],
       chart: null,
       hoverIndex: null,
@@ -475,13 +636,14 @@
     };
 
     const els = {
+      areaSelect: document.getElementById("areaSelect"),
       opacitySlider: document.getElementById("opacitySlider"),
       opacityValue: document.getElementById("opacityValue"),
       orthoImage: document.getElementById("orthoImage"),
       dsmImage: document.getElementById("dsmImage"),
       overlayImage: document.getElementById("overlayImage"),
-      sectionButtons: document.getElementById("sectionButtons"),
       lineMarker: document.getElementById("lineMarker"),
+      sectionButtons: document.getElementById("sectionButtons"),
       chartTitle: document.getElementById("chartTitle"),
       chartSubtitle: document.getElementById("chartSubtitle"),
       statArea: document.getElementById("statArea"),
@@ -490,8 +652,17 @@
       statMax: document.getElementById("statMax"),
       statusText: document.getElementById("statusText"),
       profileChart: document.getElementById("profileChart"),
-      expandMapBtn: document.getElementById("expandMapBtn")
+      expandMapBtn: document.getElementById("expandMapBtn"),
+      mapTitle: document.getElementById("mapTitle")
     };
+
+    function currentArea() {
+      return CONFIG.areas[state.areaKey];
+    }
+
+    function currentSection() {
+      return currentArea().sections.find(s => s.id === state.sectionId) || null;
+    }
 
     function splitCsvLine(line) {
       const values = [];
@@ -543,6 +714,11 @@
       return Number.isFinite(n) ? n : null;
     }
 
+    function clampHeight(value) {
+      if (value === null) return null;
+      return value < WATER_FLOOR ? WATER_FLOOR : value;
+    }
+
     function setStatus(text, isError = false) {
       els.statusText.textContent = text;
       els.statusText.classList.toggle("error", isError);
@@ -554,14 +730,28 @@
       els.opacityValue.textContent = `${els.opacitySlider.value}%`;
     }
 
-    function getCurrentSection() {
-      return CONFIG.area.sections.find(s => s.id === state.sectionId) || null;
+    function buildAreaDropdown() {
+      els.areaSelect.innerHTML = "";
+
+      Object.entries(CONFIG.areas).forEach(([key, area]) => {
+        const option = document.createElement("option");
+        option.value = key;
+        option.textContent = area.label;
+        els.areaSelect.appendChild(option);
+      });
+
+      els.areaSelect.value = state.areaKey;
+    }
+
+    function setDefaultSectionForArea() {
+      state.sectionId = currentArea().defaultSection;
+      state.hoverIndex = null;
     }
 
     function renderSectionButtons() {
       els.sectionButtons.innerHTML = "";
 
-      CONFIG.area.sections.forEach(section => {
+      currentArea().sections.forEach(section => {
         const btn = document.createElement("button");
         btn.type = "button";
         btn.textContent = section.label;
@@ -583,7 +773,7 @@
           label: row.label || row.section_id,
           sort_order: toNumber(row.sort_order),
           distance_m: toNumber(row.distance_m ?? row.distance),
-          height_m: toNumber(row.height_m)
+          height_m: clampHeight(toNumber(row.height_m))
         }))
         .filter(row => row.distance_m !== null)
         .sort((a, b) => a.distance_m - b.distance_m);
@@ -607,7 +797,7 @@
     }
 
     function updateMarker() {
-      const section = getCurrentSection();
+      const section = currentSection();
       const rows = getSectionRows();
 
       if (!section || !rows.length || !section.path || !section.path.length) {
@@ -640,13 +830,15 @@
     }
 
     function renderChart() {
+      const area = currentArea();
+      const section = currentSection();
       const rows = getSectionRows();
       const validRows = rows.filter(r => r.height_m !== null);
-      const section = getCurrentSection();
 
-      els.chartTitle.textContent = `${CONFIG.area.label} – ${section ? section.label : "Section Profile"}`;
+      els.mapTitle.textContent = `${area.label} Fixed Section Map`;
+      els.chartTitle.textContent = `${area.label} – ${section ? section.label : "Section Profile"}`;
       els.chartSubtitle.textContent = "Height profile sampled along the selected fixed section line.";
-      els.statArea.textContent = CONFIG.area.label;
+      els.statArea.textContent = area.label;
       els.statSection.textContent = section ? section.label : "—";
       els.statMin.textContent = validRows.length ? `${Math.min(...validRows.map(r => r.height_m)).toFixed(2)} m` : "—";
       els.statMax.textContent = validRows.length ? `${Math.max(...validRows.map(r => r.height_m)).toFixed(2)} m` : "—";
@@ -743,7 +935,7 @@
       }
 
       updateMarker();
-      setStatus(`Showing ${CONFIG.area.label}, ${section ? section.label : state.sectionId}. ${validRows.length} valid sampled points loaded.`);
+      setStatus(`Showing ${area.label}, ${section ? section.label : state.sectionId}. ${validRows.length} valid sampled points loaded.`);
     }
 
     function renderAll() {
@@ -751,18 +943,20 @@
       renderChart();
     }
 
-    async function loadData() {
-      setStatus(`Loading ${CONFIG.area.label} data…`);
+    async function loadAreaData() {
+      const area = currentArea();
+
+      setStatus(`Loading ${area.label} data…`);
       els.chartSubtitle.textContent = "Loading data…";
 
       try {
-        els.orthoImage.src = CONFIG.area.ortho;
-        els.dsmImage.src = CONFIG.area.dsm;
-        els.overlayImage.src = CONFIG.area.overlay;
+        els.orthoImage.src = area.ortho;
+        els.dsmImage.src = area.dsm;
+        els.overlayImage.src = area.overlay;
 
-        const response = await fetch(CONFIG.area.csv, { cache: "no-store" });
+        const response = await fetch(area.csv, { cache: "no-store" });
         if (!response.ok) {
-          throw new Error(`Could not load ${CONFIG.area.csv}`);
+          throw new Error(`Could not load ${area.csv}`);
         }
 
         const csvText = await response.text();
@@ -778,13 +972,14 @@
         state.rows = [];
         destroyChart();
         renderSectionButtons();
-        els.chartTitle.textContent = `${CONFIG.area.label} – Section Profile`;
+        els.mapTitle.textContent = `${area.label} Fixed Section Map`;
+        els.chartTitle.textContent = `${area.label} – Section Profile`;
         els.chartSubtitle.textContent = "Could not load this area's profile data.";
-        els.statArea.textContent = CONFIG.area.label;
+        els.statArea.textContent = area.label;
         els.statSection.textContent = "—";
         els.statMin.textContent = "—";
         els.statMax.textContent = "—";
-        setStatus(`Could not load Area 8. Check the file paths and deployed file names.`, true);
+        setStatus(`Could not load ${area.label}. Check the file paths and deployed file names.`, true);
       }
     }
 
@@ -802,6 +997,12 @@
       els.opacitySlider.addEventListener("input", updateOpacity);
       els.expandMapBtn.addEventListener("click", toggleExpandedMap);
 
+      els.areaSelect.addEventListener("change", async (e) => {
+        state.areaKey = e.target.value;
+        setDefaultSectionForArea();
+        await loadAreaData();
+      });
+
       els.profileChart.addEventListener("mouseleave", () => {
         state.hoverIndex = null;
         updateMarker();
@@ -815,10 +1016,12 @@
     }
 
     async function init() {
+      buildAreaDropdown();
       els.opacitySlider.value = CONFIG.defaultOpacity;
       bindEvents();
       updateOpacity();
-      await loadData();
+      setDefaultSectionForArea();
+      await loadAreaData();
     }
 
     init();
