@@ -592,6 +592,57 @@
       return currentArea().sections.find(s => s.id === state.sectionId) || null;
     }
 
+    function getUrlParams() {
+      return new URLSearchParams(window.location.search);
+    }
+
+    function areaKeyToUrlValue(areaKey) {
+      if (areaKey === "estuary") return "estuary";
+      const match = areaKey.match(/^area(\d+)$/i);
+      return match ? match[1] : areaKey;
+    }
+
+    function normalizeAreaParam(value) {
+      if (!value) return null;
+
+      const cleaned = String(value).trim().toLowerCase();
+
+      if (cleaned === "estuary" || cleaned === "whole-estuary" || cleaned === "whole_estuary") {
+        return "estuary";
+      }
+
+      if (/^\d+$/.test(cleaned)) {
+        const key = `area${cleaned}`;
+        return CONFIG.areas[key] ? key : null;
+      }
+
+      if (/^area\d+$/.test(cleaned)) {
+        return CONFIG.areas[cleaned] ? cleaned : null;
+      }
+
+      return null;
+    }
+
+    function normalizeSectionParam(value, areaKey) {
+      if (!value || !areaKey || !CONFIG.areas[areaKey]) return null;
+      const cleaned = String(value).trim().toUpperCase();
+      const match = CONFIG.areas[areaKey].sections.find(section => section.id.toUpperCase() === cleaned);
+      return match ? match.id : null;
+    }
+
+    function updateUrl() {
+      const url = new URL(window.location.href);
+      url.searchParams.set("area", areaKeyToUrlValue(state.areaKey));
+
+      if (state.sectionId) {
+        url.searchParams.set("section", state.sectionId);
+      } else {
+        url.searchParams.delete("section");
+      }
+
+      window.history.replaceState({}, "", url);
+    }
+
     function splitCsvLine(line) {
       const values = [];
       let current = "";
@@ -676,6 +727,28 @@
       state.hoverIndex = null;
     }
 
+    function applyUrlState() {
+      const params = getUrlParams();
+
+      const urlArea = normalizeAreaParam(params.get("area"));
+      if (urlArea) {
+        state.areaKey = urlArea;
+      }
+
+      const urlSection = normalizeSectionParam(params.get("section"), state.areaKey);
+      if (urlSection) {
+        state.sectionId = urlSection;
+      }
+    }
+
+    function ensureValidSectionForArea() {
+      const area = currentArea();
+      const valid = area.sections.some(section => section.id === state.sectionId);
+      if (!valid) {
+        state.sectionId = area.defaultSection;
+      }
+    }
+
     function renderSectionButtons() {
       els.sectionButtons.innerHTML = "";
 
@@ -687,6 +760,7 @@
         btn.addEventListener("click", () => {
           state.sectionId = section.id;
           state.hoverIndex = null;
+          updateUrl();
           renderAll();
         });
         els.sectionButtons.appendChild(btn);
@@ -894,6 +968,8 @@
           throw new Error("CSV loaded but no rows were found.");
         }
 
+        ensureValidSectionForArea();
+        updateUrl();
         renderAll();
       } catch (error) {
         console.error(error);
@@ -928,6 +1004,13 @@
       els.areaSelect.addEventListener("change", async (e) => {
         state.areaKey = e.target.value;
         setDefaultSectionForArea();
+
+        const sectionFromUrl = normalizeSectionParam(getUrlParams().get("section"), state.areaKey);
+        if (sectionFromUrl) {
+          state.sectionId = sectionFromUrl;
+        }
+
+        updateUrl();
         await loadAreaData();
       });
 
@@ -941,14 +1024,30 @@
           console.error("Image failed to load:", img.src);
         });
       });
+
+      window.addEventListener("popstate", async () => {
+        const oldArea = state.areaKey;
+        applyUrlState();
+        ensureValidSectionForArea();
+        els.areaSelect.value = state.areaKey;
+
+        if (state.areaKey !== oldArea) {
+          await loadAreaData();
+        } else {
+          renderAll();
+        }
+      });
     }
 
     async function init() {
+      applyUrlState();
+      ensureValidSectionForArea();
       buildAreaDropdown();
+      els.areaSelect.value = state.areaKey;
       els.opacitySlider.value = CONFIG.defaultOpacity;
       bindEvents();
       updateOpacity();
-      setDefaultSectionForArea();
+      updateUrl();
       await loadAreaData();
     }
 
